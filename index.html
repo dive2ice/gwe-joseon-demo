@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0e0b08" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>궤(櫃) : 조선의 비밀</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/quality.css" />
+  <link rel="stylesheet" href="css/cinematics.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="c" aria-label="가구를 관찰하고 조작하는 화면"></canvas>
+    <div class="dialog-scrim" aria-hidden="true"></div>
+
+    <header id="hud-top">
+      <h1>궤(櫃) : 조선의 비밀</h1>
+      <p class="subtitle" id="hud-subtitle">조선 후기 · 동궁의 열 궤 · DLC 실측 서고</p>
+    </header>
+
+    <aside id="prologue" class="panel">
+      <h2>서문</h2>
+      <p>
+        세자의 침전에서 발견된 열 목가구.
+        못 하나 없이 짜맞춘 결구와 놋쇠·자개·혼천·벽사·규표의 너머에,
+        사천장(思天匠)의 후예만이 열 수 있는 비밀이 잠들어 있다.
+      </p>
+      <p class="prologue-ch1">
+        첫 함은 <strong>반닫이</strong>. 장부의 결을 읽고, 들쇠의 무게를 손에 담아 보시오.
+      </p>
+      <p class="proto-note">프로토: 전부 개방 · 제1장 기준작</p>
+      <button id="btn-start" type="button">탐구 시작</button>
+      <div class="showcase-entry">
+        <p>두 가구에 남은 하나의 비밀</p>
+        <button type="button" data-showcase="4">약장 살펴보기</button>
+        <button type="button" data-showcase="5">경대 살펴보기</button>
+      </div>
+    </aside>
+
+    <aside id="hub" class="panel hub-panel hidden">
+      <h2>비밀 서고</h2>
+      <p class="hub-intro">열고자 하는 궤를 고르시오. <span class="proto-note">프로토: 전부 개방</span></p>
+      <button id="btn-ledger-hub" type="button">증거 장부</button>
+      <button id="btn-eval-hub" type="button">구간 평가</button>
+      <button id="btn-intro-replay" type="button">서문 다시 보기</button>
+      <ul id="hub-list" class="hub-list"></ul>
+      <div id="hub-dlc" class="hub-dlc">
+        <h3 class="hub-dlc-title">장인의 실측 서고</h3>
+        <p class="hub-intro hub-dlc-intro">DLC · 제11–15장 <span class="proto-note">프로토: 전부 개방</span></p>
+        <ul id="hub-dlc-list" class="hub-list"></ul>
+      </div>
+    </aside>
+
+    <div id="hud-objective" class="panel hidden">
+      <div class="objective-heading"><div class="label">현재 목표</div><button id="btn-story" type="button">현장 기록</button></div>
+      <p id="objective-text">—</p>
+      <div id="step-progress" aria-label="진행도"></div>
+    </div>
+
+    <div id="ch1-tools" class="ch1-tools hidden" aria-label="챕터 도구">
+      <button id="btn-craft-eye" type="button" title="장인의 안목">장인의 안목</button>
+      <button id="btn-hint" type="button" title="힌트">힌트</button>
+    </div>
+
+    <nav id="view-tools" class="view-tools hidden" aria-label="관찰 시점">
+      <button id="btn-inspect" type="button" aria-pressed="false">가까이 보기</button>
+      <button id="btn-view-reset" type="button">시점 복원</button>
+    </nav>
+    <div id="gesture-label" class="gesture-label hidden" aria-hidden="true"></div>
+    <div id="hud-hint" class="toast hidden" role="status"></div>
+    <div id="feel-caption" class="feel-caption hidden" role="status" aria-live="polite"></div>
+
+    <aside id="story-event" class="story-event hidden" role="status" aria-live="polite" aria-atomic="true">
+      <span class="story-event-label">발견</span>
+      <strong id="story-event-title"></strong>
+      <p id="story-event-text"></p>
+      <button id="btn-event-close" type="button" aria-label="발견 알림 닫기">×</button>
+    </aside>
+
+    <aside id="story-journal" class="panel story-journal hidden" role="dialog" aria-modal="true" aria-labelledby="story-journal-title">
+      <p class="story-event-label">이 장에서 발견한 흔적</p>
+      <h2 id="story-journal-title">현장 기록</h2>
+      <ul id="story-journal-list"></ul>
+      <button id="btn-story-close" type="button">닫기</button>
+    </aside>
+
+    <section id="cinematic" class="cinematic hidden" role="dialog" aria-modal="true" aria-labelledby="cinematic-title" aria-describedby="cinematic-text">
+      <div class="cinematic-art" aria-hidden="true">
+        <div class="intro-moon"></div><div class="intro-haze"></div>
+        <svg class="intro-illustration" viewBox="0 0 700 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g class="intro-palace" stroke="currentColor">
+            <path d="M30 460H670M55 484H640M94 506H620" opacity=".3"/>
+            <path d="M112 335L198 260H505L586 335H112Z" fill="#182526"/>
+            <path d="M70 338Q130 350 200 259H505Q578 349 630 338M104 346H599M179 275H519" stroke-width="4"/>
+            <path d="M142 351V457M211 352V457M486 352V457M556 352V457M135 450H564M154 371H546" stroke-width="7"/>
+            <path d="M268 365H424V450H268V365ZM319 365V450M371 365V450M269 395H424M269 421H424" opacity=".5"/>
+            <path d="M342 238L355 221L368 238M188 256L201 241M502 256L491 241"/>
+            <path d="M72 525C217 487 391 539 617 518M40 550C178 520 333 555 669 552" opacity=".25"/>
+            <path d="M66 344V490M618 343V490M46 490H84M599 490H637" opacity=".4"/>
+          </g>
+          <g class="intro-letter" transform="rotate(-8 350 325)" stroke="currentColor">
+            <path d="M184 142H506V495L488 509H185V142Z" fill="#293332" stroke-width="2"/>
+            <path d="M208 165H480V478H208V165Z" opacity=".35"/>
+            <path d="M438 201V391M396 201V411M355 201V384M313 201V426M273 201V345" stroke-dasharray="16 12" stroke-width="5" opacity=".65"/>
+            <path d="M418 435H460V476H418V435Z" fill="#784034" stroke="#ac7060"/>
+            <path d="M430 445V466M447 445V466M427 454H451" stroke="#c29179"/>
+            <path d="M170 512L524 512" opacity=".3"/>
+          </g>
+          <g class="intro-chest" stroke="currentColor" stroke-width="2">
+            <path d="M126 267L413 213L564 284L275 346L126 267Z" fill="#283735"/>
+            <path d="M126 267V420L275 499V346M275 499L564 429V284M126 420L275 499" fill="#192627"/>
+            <path d="M151 285V408L253 461V342M300 360V470L540 410V304" opacity=".5"/>
+            <path d="M300 385L540 326M301 424L540 366M311 274L390 258L434 283L354 300L311 274Z" opacity=".6"/>
+            <path d="M393 336V380L429 371V328M405 349L417 346V361L405 364V349Z" fill="#91774e"/>
+            <path d="M160 280V312M259 336V368M281 348V380M548 288V320M164 412V444M288 459V490M548 397V429" stroke-width="8"/>
+            <path d="M82 531L291 567L616 487M104 552L281 584" opacity=".2"/>
+          </g>
+        </svg>
+        <span class="intro-glyph">櫃</span>
+      </div>
+      <button id="btn-cinematic-skip" class="cinematic-skip" type="button">인트로 건너뛰기</button>
+      <div class="cinematic-copy">
+        <p id="cinematic-label" class="cinematic-label"></p>
+        <h2 id="cinematic-title"></h2>
+        <p id="cinematic-text"></p>
+        <div class="cinematic-actions"><span id="cinematic-count"></span><button id="btn-cinematic-next" type="button">다음</button></div>
+        <div class="cinematic-timer" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <aside id="inventory-strip" class="inventory-strip hidden" aria-label="놋쇠 부품 인벤토리"></aside>
+
+    <footer id="hud-bottom" class="hidden">
+      <button id="btn-reset" type="button">초기화</button>
+      <button id="btn-hub" type="button">서고로</button>
+      <button id="btn-ledger" type="button">장부</button>
+      <span id="order-hint"></span>
+    </footer>
+
+    <aside id="ledger" class="panel ledger-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ledger-title">
+      <h2 id="ledger-title">증거 장부</h2>
+      <p class="ledger-intro">발견한 단서를 다시 읽을 수 있소. 장 사이를 기억으로 잇지 마시오.</p>
+      <ul id="ledger-list"></ul>
+      <button id="btn-ledger-close" type="button">닫기</button>
+    </aside>
+
+    <div id="finale" class="panel hidden" role="dialog" aria-modal="true">
+      <h2 id="finale-title">비밀</h2>
+      <blockquote>
+        <p id="finale-body"></p>
+        <footer id="finale-footer"></footer>
+      </blockquote>
+      <p class="epilogue" id="finale-epilogue"></p>
+      <div id="ending-briefs" class="ending-briefs hidden"></div>
+      <div id="ending-choices" class="ending-choices hidden"></div>
+      <div class="finale-actions">
+        <button id="btn-replay" type="button">다시 하기</button>
+        <button id="btn-finale-hub" type="button">서고로 돌아가기</button>
+        <button id="btn-eval" type="button" class="hidden">구간 평가</button>
+      </div>
+    </div>
+
+    <aside id="eval-sheet" class="panel eval-panel hidden" role="dialog" aria-modal="true" aria-labelledby="eval-title">
+      <h2 id="eval-title">대표 구간 평가</h2>
+      <p class="eval-intro">약장·경대를 만진 느낌을 적으시오. 정답을 묻지 않습니다.</p>
+      <form id="eval-form">
+        <label>경험
+          <select name="cohort">
+            <option value="beginner">입문자</option>
+            <option value="experienced">퍼즐 경험자</option>
+          </select>
+        </label>
+        <label>재미 (1–5)
+          <input name="fun" type="number" min="1" max="5" value="3" />
+        </label>
+        <label>조작 불편 (1–5, 낮을수록 편함)
+          <input name="discomfort" type="number" min="1" max="5" value="2" />
+        </label>
+        <label>깨달음 하나
+          <input name="aha1" type="text" maxlength="160" placeholder="예: 연 서랍이 옆 걸쇠를 누른다" />
+        </label>
+        <label>깨달음 둘
+          <input name="aha2" type="text" maxlength="160" placeholder="예: 빛은 스치면 잠기지 않는다" />
+        </label>
+        <label>왜 풀렸는지
+          <textarea name="causation" rows="3" maxlength="400" placeholder="걸쇠·하중 또는 빛 경로를 인과로 적으시오."></textarea>
+        </label>
+        <label>다음 장 의향 (1–5)
+          <input name="nextIntent" type="number" min="1" max="5" value="3" />
+        </label>
+        <label class="eval-hint-stage">힌트 단계
+          <input name="hintStage" type="number" min="0" max="3" value="0" readonly />
+        </label>
+        <label>메모
+          <textarea name="notes" rows="2" maxlength="240"></textarea>
+        </label>
+      </form>
+      <div class="eval-actions">
+        <button id="btn-eval-save" type="button">적기</button>
+        <button id="btn-eval-close" type="button">닫기</button>
+      </div>
+    </aside>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/build/three.module.js",
+      "three/addons/": "./vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js?v=story3"></script>
+  <script>
+    window.addEventListener('error', (e) => {
+      const el = document.getElementById('boot-error') || (() => {
+        const d = document.createElement('div');
+        d.id = 'boot-error';
+        d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;z-index:9999;background:#4a2018;color:#f5e6d8;padding:12px;border-radius:8px;font:14px sans-serif';
+        document.body.appendChild(d);
+        return d;
+      })();
+      el.textContent = '로드 오류: ' + (e.message || e);
+    });
+  </script>
+</body>
+</html>

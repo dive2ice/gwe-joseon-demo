@@ -1,0 +1,73 @@
+/* The craft workshop keeps the furniture, light, and hands at the centre. */
+.showcase-entry { border-top: 1px solid #b39c6c45; margin-top: 24px; padding-top: 20px; }
+#prologue .showcase-entry p { color: #b7a892; font-size: 12px; margin-bottom: 10px; letter-spacing: .1em; }
+.showcase-entry button { margin: 0 5px 5px 0; font-size: 13px; }
+.dialog-scrim { display: none; position: absolute; inset: 0; background: #05090aaa; z-index: 21; backdrop-filter: blur(4px); }
+.has-dialog .dialog-scrim { display: block; }
+#finale { z-index: 23; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #f0d7a0; outline-offset: 4px; }
+.quality-slice { --text: #ece4d4; --muted: #bcb9ab; --panel: #131c1ce8; --wood: #dbcaab; --brass: #a99366; --accent: #dcc18b; }
+.quality-slice #app::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at 50% 48%, transparent 40%, #02090948 100%), linear-gradient(#06101070, transparent 20%, transparent 77%, #061010a0); }
+.quality-slice #hud-top { left: 28px; right: 28px; top: calc(22px + var(--sat)); transform: none; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d3bd8a30; padding-bottom: 17px; text-align: left; }
+.quality-slice #hud-top h1 { color: #e5d4b2; font-size: 17px; font-weight: 400; letter-spacing: .12em; }
+.quality-slice #hud-top .subtitle { font-size: 12px; letter-spacing: .13em; color: #bdc7c3; }
+.quality-slice #hud-objective { top: calc(90px + var(--sat)); left: 28px; width: 260px; min-width: 0; max-width: 32vw; background: linear-gradient(110deg,#0b171cd6,#0b171c40); border: 0; border-left: 1px solid #c8b18180; border-radius: 0; box-shadow: none; backdrop-filter: blur(5px); padding: 13px 17px; }
+.quality-slice #hud-objective .label { color: #bca276; font-size: 10px; letter-spacing: .22em; }
+.quality-slice #objective-text { font-size: 13px; line-height: 1.8; word-break: keep-all; margin: 7px 0 12px; }
+.quality-slice #step-progress { gap: 12px; }
+.quality-slice #step-progress .step { padding: 4px 0; border-radius: 0; background: none; border: 0; border-bottom: 1px solid #ffffff22; font-size: 10px; color: #bcc4bf; }
+.quality-slice #step-progress .step.active { color: #efd8a6; border-color: #e4c487; box-shadow: none; }
+.quality-slice #step-progress .step.done { color: #a5cbb5; }
+.quality-slice button { border-radius: 3px; border-color: #b09a6a60; background: #102022c9; color: #ded6c5; font-size: 12px; letter-spacing: .03em; box-shadow: none; }
+.quality-slice button:hover { background: #283835ed; border-color: #d7bf89; }
+.quality-slice button[aria-pressed=true] { color: #f3dba8; border-color: #cfad6c; background: #344135; }
+.quality-slice .ch1-tools { right: 28px; top: calc(90px + var(--sat)); gap: 8px; }
+.quality-slice .ch1-tools button { background: #102022d9; min-width: 92px; }
+.view-tools { position: absolute; right: 28px; bottom: calc(32px + var(--sab)); display: flex; gap: 8px; z-index: 8; }
+.gesture-label { position: absolute; bottom: calc(92px + var(--sab)); left: 50%; transform: translateX(-50%); z-index: 6; pointer-events: none; color: #cad2ca; font-size: 11px; letter-spacing: .05em; text-shadow: 0 1px 4px #000; white-space: nowrap; }
+.gesture-label.engaged { color: #f5d49b; }
+.quality-slice #hud-bottom { left: 28px; right: 270px; bottom: calc(32px + var(--sab)); gap: 8px; }
+.quality-slice #order-hint { font-size: 11px; line-height: 1.6; padding: 6px 12px; border: 0; border-left: 1px solid #bfa16e50; background: #071316b0; border-radius: 0; max-width: min(470px,38vw); }
+.quality-slice .toast { border-radius: 3px; background: #122325f0; border-color: #8dafa2; bottom: calc(128px + var(--sab)); font-size: 12px; max-width: min(560px,90vw); line-height: 1.7; }
+.quality-slice .feel-caption { bottom: calc(178px + var(--sab)); background: #122325e8; border-color: #cab88950; font-size: 11px; border-radius: 3px; }
+.quality-slice .ledger-panel, .quality-slice #finale { background: #172122f5; border-color: #aa986860; box-shadow: 0 24px 80px #0009; border-radius: 3px; padding: 28px; }
+.quality-slice #ledger-list li { border-left-width: 1px; padding-left: 16px; }
+@media(max-width: 700px) {
+  .quality-slice #hud-top { left: 16px; right: 16px; top: calc(15px + var(--sat)); padding-bottom: 12px; }
+  .quality-slice #hud-top h1 { font-size: 13px; letter-spacing: .04em; }
+  .quality-slice #hud-top .subtitle { font-size: 10px; letter-spacing: .02em; }
+  .quality-slice #hud-objective { top: calc(61px + var(--sat)); left: 16px; max-width: none; width: calc(100% - 32px); padding: 8px 12px; }
+  .quality-slice #objective-text { font-size: 12px; line-height: 1.6; margin: 4px 0 5px; }
+  .quality-slice #step-progress { gap: 14px; }
+  .quality-slice #hud-objective .label { font-size: 9px; }
+  .quality-slice .ch1-tools { top: auto; bottom: calc(123px + var(--sab)); right: 16px; flex-direction: row; gap: 6px; }
+  .quality-slice .ch1-tools button { min-width: 0; padding: 8px 11px; min-height: 40px; font-size: 11px; }
+  .quality-slice #hud-bottom { left: 16px; right: 16px; bottom: calc(14px + var(--sab)); gap: 6px; align-items: flex-end; }
+  .quality-slice #hud-bottom button { padding: 9px 10px; min-height: 44px; font-size: 11px; }
+  .quality-slice #order-hint { order: -1; flex-basis: 100%; max-width: none; font-size: 10px; min-height: 32px; max-height: 58px; overflow-y: auto; touch-action: pan-y; padding: 5px 9px; }
+  .view-tools { right: 16px; bottom: calc(14px + var(--sab)); gap: 5px; }
+  .quality-slice .view-tools button { font-size: 10px; padding: 8px 8px; min-height: 44px; }
+  .gesture-label { left: 16px; transform: none; bottom: calc(105px + var(--sab)); font-size: 9px; letter-spacing: 0; }
+  .quality-slice .toast { bottom: calc(178px + var(--sab)); font-size: 11px; width: max-content; }
+  .quality-slice .feel-caption { bottom: calc(225px + var(--sab)); font-size: 10px; }
+  .quality-slice .ledger-panel, .quality-slice #finale { padding: 20px; width: calc(100% - 32px); max-width: none; }
+}
+@media(max-height: 520px) and (min-width:701px) {
+  .quality-slice #hud-objective { width: 220px; top: 70px; }
+  .quality-slice #hud-bottom, .view-tools { bottom: 12px; }
+  .gesture-label { bottom: 65px; }
+}
+
+/* Chapter ten keeps all nine parts reachable without covering camera controls. */
+.quality-slice .inventory-strip { top: calc(149px + var(--sat)); right: 28px; border-radius: 3px; background: #122022ed; max-width: 252px; }
+.quality-slice .inventory-strip .inv-part { border-radius: 2px; }
+@media(max-width:700px) {
+  .quality-slice .inventory-strip { top: calc(185px + var(--sat)); bottom: auto; left: 16px; right: 16px; max-width: none; padding: 7px 9px; }
+  .quality-slice .inventory-strip .inv-label { display: none; }
+  .quality-slice .inventory-strip .inv-parts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .quality-slice .inventory-strip .inv-part { flex: 1 1 0; width: auto; min-width: 0; height: 44px; }
+  .quality-slice .inventory-strip .inv-count { font-size: 10px; margin-top: 4px; }
+}
+
+.quality-slice .inventory-strip .inv-part { height: 44px; line-height: 1.25; }
+.quality-slice .inventory-strip .inv-part small { display: block; font-size: 9px; color: #c7bb9f; font-weight: 400; margin-top: 2px; }
