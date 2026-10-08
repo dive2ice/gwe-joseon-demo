@@ -2,12 +2,12 @@
 .showcase-entry { border-top: 1px solid #b39c6c45; margin-top: 24px; padding-top: 20px; }
 #prologue .showcase-entry p { color: #b7a892; font-size: 12px; margin-bottom: 10px; letter-spacing: .1em; }
 .showcase-entry button { margin: 0 5px 5px 0; font-size: 13px; }
-.dialog-scrim { display: none; position: absolute; inset: 0; background: #05090aaa; z-index: 21; backdrop-filter: blur(4px); }
+.dialog-scrim { display: none; position: absolute; inset: 0; background: #050b16aa; z-index: 21; backdrop-filter: blur(4px); }
 .has-dialog .dialog-scrim { display: block; }
 #finale { z-index: 23; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #f0d7a0; outline-offset: 4px; }
-.quality-slice { --text: #ece4d4; --muted: #bcb9ab; --panel: #131c1ce8; --wood: #dbcaab; --brass: #a99366; --accent: #dcc18b; }
-.quality-slice #app::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at 50% 48%, transparent 40%, #02090948 100%), linear-gradient(#06101070, transparent 20%, transparent 77%, #061010a0); }
+.quality-slice { --text: #ece4d4; --muted: #bcb9ab; --panel: #142436e8; --wood: #dbcaab; --brass: #a99366; --accent: #dcc18b; }
+.quality-slice #app::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at 50% 48%, transparent 40%, #050c1948 100%), linear-gradient(#0a182570, transparent 20%, transparent 77%, #0a1825a0); }
 .quality-slice #hud-top { left: 28px; right: 28px; top: calc(22px + var(--sat)); transform: none; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d3bd8a30; padding-bottom: 17px; text-align: left; }
 .quality-slice #hud-top h1 { color: #e5d4b2; font-size: 17px; font-weight: 400; letter-spacing: .12em; }
 .quality-slice #hud-top .subtitle { font-size: 12px; letter-spacing: .13em; color: #bdc7c3; }
@@ -30,7 +30,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .quality-slice #order-hint { font-size: 11px; line-height: 1.6; padding: 6px 12px; border: 0; border-left: 1px solid #bfa16e50; background: #071316b0; border-radius: 0; max-width: min(470px,38vw); }
 .quality-slice .toast { border-radius: 3px; background: #122325f0; border-color: #8dafa2; bottom: calc(128px + var(--sab)); font-size: 12px; max-width: min(560px,90vw); line-height: 1.7; }
 .quality-slice .feel-caption { bottom: calc(178px + var(--sab)); background: #122325e8; border-color: #cab88950; font-size: 11px; border-radius: 3px; }
-.quality-slice .ledger-panel, .quality-slice #finale { background: #172122f5; border-color: #aa986860; box-shadow: 0 24px 80px #0009; border-radius: 3px; padding: 28px; }
+.quality-slice .ledger-panel, .quality-slice #finale { background: #172637f5; border-color: #aa986860; box-shadow: 0 24px 80px #0009; border-radius: 3px; padding: 28px; }
 .quality-slice #ledger-list li { border-left-width: 1px; padding-left: 16px; }
 @media(max-width: 700px) {
   .quality-slice #hud-top { left: 16px; right: 16px; top: calc(15px + var(--sat)); padding-bottom: 12px; }

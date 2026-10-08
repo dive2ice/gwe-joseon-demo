@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createMechanicalProjection } from './mechanical-projection.js';
 import { alongAxis, onPlane } from './slice-drag.js';
 import { prefersReducedMotion } from './anim.js';
-import { chapterPresentation, gestureDescription } from './chapter-presentation.js';
+import { chapterPresentation, gestureDescription } from './chapter-presentation.js?v=bg-20261008';
 
 /** Presentation and camera-space gestures. Puzzle rules remain in the chapter modules. */
 export function createSliceExperience({ scene, camera, controls, renderer, canvas, lights, getChapter, getInput, getMode, loadChapter, resumeAudio }) {

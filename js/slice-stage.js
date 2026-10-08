@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { chapterPresentation } from './chapter-presentation.js';
+import { chapterPresentation } from './chapter-presentation.js?v=bg-20261008';
 import { STAGE_SCENES } from './campaign-direction.js';
 import { prefersReducedMotion } from './anim.js';
 
@@ -11,9 +11,9 @@ export function createSliceStage(scene, renderer, mats) {
   const shell = new THREE.Group(), decor = new THREE.Group();
   shell.name = 'stage-architecture'; decor.name = 'stage-dressing'; root.add(shell, decor);
   const timber = new THREE.MeshStandardMaterial({ color: 0x342a23, roughness: .88, map: mats.sliceWoodDark?.map || null });
-  const plaster = new THREE.MeshStandardMaterial({ color: 0x393c38, roughness: 1 });
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x303630, roughness: .96 });
-  const paper = new THREE.MeshStandardMaterial({ color: 0x526569, roughness: .96, emissive: 0x304248, emissiveIntensity: .20, map: mats.slicePaper?.map || null });
+  const plaster = new THREE.MeshStandardMaterial({ color: 0x303947, roughness: 1 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x303744, roughness: .96 });
+  const paper = new THREE.MeshStandardMaterial({ color: 0x59697d, roughness: .96, emissive: 0x203044, emissiveIntensity: .20, map: mats.slicePaper?.map || null });
   const brass = new THREE.MeshStandardMaterial({ color: 0x97805c, metalness: .7, roughness: .5 });
   const parchment = new THREE.MeshStandardMaterial({ color: 0xb2a384, roughness: 1 });
   const jade = new THREE.MeshStandardMaterial({ color: 0x536d66, roughness: .5 });
@@ -36,7 +36,7 @@ export function createSliceStage(scene, renderer, mats) {
     box(.09, 3.3, .13, timber, x - .98, 1.65, -1.96); box(1.85, .12, .09, timber, x, .53, -1.97);
   }
   box(6.4, .12, .13, timber, 0, 2.92, -1.94); box(6.4, .18, .13, timber, 0, .12, -1.94);
-  const mat = box(1.78, .006, 1.12, new THREE.MeshStandardMaterial({ color: 0x343a35, roughness: 1 }), 0, .001, .08);
+  const mat = box(1.78, .006, 1.12, new THREE.MeshStandardMaterial({ color: 0x343944, roughness: 1 }), 0, .001, .08);
   for (const x of [-.86, .86]) box(.012, .008, 1.06, brass, x, .004, .08);
   for (const z of [-.44, .6]) box(1.72, .008, .012, brass, 0, .004, z);
   const moon = new THREE.DirectionalLight(0xaec9d3, .75); moon.position.set(-2, 3, -1.5); root.add(moon);

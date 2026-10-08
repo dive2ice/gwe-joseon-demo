@@ -14,8 +14,8 @@ import {
   playNacreClick, playNacreChime, playRubPaper,
 } from './audio.js';
 import { createMaterials } from './materials.js';
-import { createSliceStage } from './slice-stage.js?v=ko-20261008';
-import { createSliceExperience } from './slice-experience.js';
+import { createSliceStage } from './slice-stage.js?v=bg-20261008';
+import { createSliceExperience } from './slice-experience.js?v=bg-20261008';
 import { createCampaignCinematics } from './campaign-cinematics.js';
 import { playStoryCue } from './audio.js';
 import { createAnimSystem, prefersReducedMotion } from './anim.js';
