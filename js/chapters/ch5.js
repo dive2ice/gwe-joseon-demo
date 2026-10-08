@@ -16,9 +16,9 @@ export const id = 5;
 export const title = '경대';
 export const blurb = '등잔과 거울로 빛 경로를 만들고, 펼친 도안을 가림판으로 쓴 뒤 빗장을 당기시오.';
 export const steps = [
-  { id: 'A', label: 'A 빛' },
-  { id: 'B', label: 'B 가림판' },
-  { id: 'C', label: 'C 빗장' },
+  { id: 'A', label: '빛' },
+  { id: 'B', label: '가림판' },
+  { id: 'C', label: '빗장' },
 ];
 
 export const hint = '등잔을 옮기고 거울을 밀어 빛을 잇시오. 탁자 위 쪽지에 현장 단서가 있소.';

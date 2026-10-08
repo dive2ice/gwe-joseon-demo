@@ -20,8 +20,8 @@ export const id = 4;
 export const title = '약장';
 export const blurb = '약성패와 옆 걸쇠를 읽고, 연 서랍을 밀어 하중을 푼 뒤 약재함을 찾으시오.';
 export const steps = [
-  { id: 'A', label: 'A 서랍' },
-  { id: 'B', label: 'B 약재' },
+  { id: 'A', label: '서랍' },
+  { id: 'B', label: '약재' },
   { id: 'C', label: '쪽지' },
 ];
 
@@ -32,7 +32,7 @@ export const HINT_PARTIAL = '서랍 옆 걸쇠와, 끝까지 열렸을 때 눌�
 /** Stage 2 (relation) — no MID/TOP/BOT listing */
 export const HINT_RELATION = '연 서랍을 조금 밀어 넣으면 하중이 풀리고, 옆 걸쇠는 열린 채로 남습니다.';
 /** Spoiler: explicit drawer ids — stage 3+ only */
-export const HINT_FULL = '중 → 상 → 하 (MID→TOP→BOT): 각 칸을 연 뒤 조금 밀어 하중을 푸시오 — 그다음 숨은 약재 서랍';
+export const HINT_FULL = '가운데 → 위 → 아래: 각 칸을 연 뒤 조금 밀어 하중을 푸시오 — 그다음 숨은 약재 서랍';
 
 /** Extension bands along drawer travel 0–1 */
 export const LATCH_OUT = 0.55;
@@ -178,7 +178,7 @@ export function create(api) {
       ctx.font = 'bold 15px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('藥性 · 처방 차례', 128, 18);
+      ctx.fillText('약재 · 처방 차례', 128, 18);
       ctx.font = '13px serif';
       lines.forEach((ln, i) => {
         if (i > 0) {
@@ -213,7 +213,7 @@ export function create(api) {
       ctx.font = '12px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('匠人 덧새김', 160, 16);
+      ctx.fillText('장인의 덧새김', 160, 16);
       ctx.font = '13px serif';
       lines.forEach((ln, i) => {
         ctx.fillStyle = i === 2 ? '#c9a070' : '#e8d9a8';
@@ -229,7 +229,7 @@ export function create(api) {
       return mats.paper || brass;
     }
   }
-  const rxMat = makeRxPlaque(['① 中藥 (중칸)', '② 上 귀중약', '③ 下 독·무거운 약']);
+  const rxMat = makeRxPlaque(['가운데 · 보통 약재', '위쪽 · 귀한 약재', '아래쪽 · 독하거나 무거운 약재']);
   const rxPlaque = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.15), rxMat);
   rxPlaque.position.set(0, bodyY0 + BODY_H + 0.058, frontZ + 0.02);
   // Slight tilt toward player for readability
@@ -266,27 +266,27 @@ export function create(api) {
   });
 
   // One paper atlas for all drawer names; labels retain their own grain and ink wear.
-  const hanjaLabels = ['人', '參', '黃', '芪', '當', '歸', '川', '芎', '白', '朮', '茯', '苓',
-    '甘', '草', '陳', '皮', '半', '夏', '生', '薑', '大', '棗', '桂', '枝'];
-  const labelTexts = ['상', '중', '하', ...hanjaLabels];
+  const herbLabels = ['인삼', '황기', '당귀', '천궁', '백출', '복령', '감초', '진피', '반하', '생강', '대추', '계지',
+    '작약', '지황', '맥문동', '오미자', '육계', '방풍', '길경', '산수유', '택사', '치자', '숙지황', '박하'];
+  const labelTexts = ['상', '중', '하', ...herbLabels];
   let labelMat = paper;
   try {
     const c = document.createElement('canvas');
-    c.width = 512; c.height = 256;
+    c.width = 1024; c.height = 256;
     const ctx = c.getContext('2d');
     labelTexts.forEach((text, i) => {
-      const x = (i % 8) * 64; const y = Math.floor(i / 8) * 64;
-      ctx.fillStyle = '#bc9d67'; ctx.fillRect(x, y, 64, 64);
-      ctx.fillStyle = '#d9c79f'; ctx.fillRect(x + 3, y + 4, 58, 56);
+      const x = (i % 8) * 128; const y = Math.floor(i / 8) * 64;
+      ctx.fillStyle = '#bc9d67'; ctx.fillRect(x, y, 128, 64);
+      ctx.fillStyle = '#d9c79f'; ctx.fillRect(x + 3, y + 4, 122, 56);
       for (let n = 0; n < 28; n++) {
         ctx.fillStyle = n % 3 ? 'rgba(91,63,28,0.07)' : 'rgba(255,240,202,0.16)';
-        ctx.fillRect(x + 4 + (n * 31 + i * 7) % 54, y + 6 + (n * 17) % 50, 4 + n % 8, 1);
+        ctx.fillRect(x + 4 + (n * 31 + i * 7) % 118, y + 6 + (n * 17) % 50, 4 + n % 8, 1);
       }
       ctx.fillStyle = '#3c2d1e';
-      ctx.font = i < 3 ? 'bold 35px serif' : '32px serif';
+      ctx.font = i < 3 ? 'bold 37px serif' : text.length > 2 ? '25px serif' : '29px serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(text, x + 32, y + 33);
-      ctx.fillStyle = '#934b36'; ctx.fillRect(x + 49, y + 48, 6, 6);
+      ctx.fillText(text, x + 64, y + 33, 112);
+      ctx.fillStyle = '#934b36'; ctx.fillRect(x + 113, y + 48, 6, 6);
     });
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -303,7 +303,7 @@ export function create(api) {
     }
     return new THREE.Mesh(geo, labelMat);
   }
-  let hanjaIdx = 0;
+  let herbIdx = 0;
 
   function ringPull(mat, scale = 1) {
     const g = new THREE.Group();
@@ -368,7 +368,7 @@ export function create(api) {
         });
         g.add(pull);
         // Engraved Korean band label plaque
-        const plaque = makeLabelMesh(INTERACTIVE[iid].label, 0.032, Math.min(0.028, rh * 0.39));
+        const plaque = makeLabelMesh(INTERACTIVE[iid].label, 0.05, Math.min(0.028, rh * 0.39));
         plaque.position.set(0, rh * 0.22, 0.072);
         plaque.userData = { id: iid, kind: 'drawer' };
         g.add(plaque);
@@ -404,10 +404,10 @@ export function create(api) {
         const pull = ringPull(brass, 0.75);
         pull.position.set(cx, cy - rh * 0.12, drawerFrontZ + 0.012);
         bodyGroup.add(pull);
-        // Fake Hanja label strip
-        const label = hanjaLabels[hanjaIdx % hanjaLabels.length];
-        hanjaIdx += 1;
-        const plaque = makeLabelMesh(label, 0.026, Math.min(0.023, rh * 0.37));
+        // Decorative herb label strip
+        const label = herbLabels[herbIdx % herbLabels.length];
+        herbIdx += 1;
+        const plaque = makeLabelMesh(label, 0.058, Math.min(0.03, rh * 0.4));
         plaque.position.set(cx, cy + rh * 0.2, drawerFrontZ + 0.012);
         bodyGroup.add(plaque);
       }
@@ -448,7 +448,7 @@ export function create(api) {
   bodyGroup.add(boxMesh(THREE, 0.01, Math.abs(drawers.BOT.baseY - drawers.TOP.baseY) + 0.04, 0.01, brassB,
     latchX + 0.05, (drawers.BOT.baseY + drawers.TOP.baseY) / 2, latchZ - 0.02));
 
-  const floorMat = makeFloorPlaque(['걸쇠는 연 칸을 조금 밀어', '하중을 푼 뒤에야 옆칸이 산다', '약성패 ②③은 덧씌운 글']);
+  const floorMat = makeFloorPlaque(['걸쇠는 연 칸을 조금 밀어', '하중을 푼 뒤에야 옆칸이 산다', '약성패 둘째·셋째는 덧씌운 글']);
   const floorInsc = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.12), floorMat);
   floorInsc.rotation.x = -Math.PI / 2 + 0.42;
   floorInsc.position.set(0, bodyY0 + 0.028, BODY_D / 2 + 0.045);

@@ -19,8 +19,8 @@ export const id = 11;
 export const title = '뒤주';
 export const blurb = '자물쇠와 뚜껑 균형으로 이중바닥의 비밀을 찾으시오.';
 export const steps = [
-  { id: 'A', label: 'A 자물쇠' },
-  { id: 'B', label: 'B 균형' },
+  { id: 'A', label: '자물쇠' },
+  { id: 'B', label: '균형' },
   { id: 'C', label: '이중바닥' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -28,7 +28,7 @@ export const hint = '걸쇠를 돌려 닳은 각에 맞춘 뒤, 균형보의 추
 export const HINT_PARTIAL = '걸쇠는 닳아 빛나는 각까지 돌리시오. 추는 보를 따라 한 칸씩 밀고, 닳은 추 눈금에 멈추시오.';
 export const HINT_RELATION = '걸쇠가 닳은 각에 못 미치면 추는 열리지 않습니다. 추가 그 눈금에 머물러야 이중바닥이 보이고, 벗어나면 숨습니다. 눈금만으로는 바닥이 들리지 않습니다.';
 /** Spoiler: open angle and weight index */
-export const HINT_FULL = '정답: 걸쇠 0.8 rad · 추 칸 인덱스 2 (5칸 중 가운데) — 그다음 이중바닥';
+export const HINT_FULL = '정답: 걸쇠는 아래로 약 0.8라디안까지, 추는 다섯 칸 중 가운데 눈금까지 — 그다음 이중바닥';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Kept. Not the phase gate — two clicks must not open the weight. */

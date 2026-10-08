@@ -17,8 +17,8 @@ export const id = 15;
 export const title = '의궤함';
 export const blurb = '문서 트레이를 당기고 봉인 끈 매듭을 풀어 기록 쪽지를 찾으시오.';
 export const steps = [
-  { id: 'A', label: 'A 서랍' },
-  { id: 'B', label: 'B 봉인' },
+  { id: 'A', label: '문서함' },
+  { id: 'B', label: '봉인' },
   { id: 'C', label: '기록' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -26,7 +26,7 @@ export const hint = '문서 트레이를 앞으로 당긴 뒤, 봉인 매듭 패
 export const HINT_PARTIAL = '봉인 끈은 인장 매듭 순서대로. 청 → 적 → 황…';
 export const HINT_RELATION = '청 끈을 본보기로 적·황 매듭을 이으시오. 인장 패의 순서가 끈의 순서다.';
 /** Spoiler: cord indices */
-export const HINT_FULL = '정답: 봉인 끈 [2, 0, 1] (청→적→황) — 그다음 기록 쪽지';
+export const HINT_FULL = '정답: 봉인 끈 청→적→황 — 그다음 기록 쪽지';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Cord knot segment click order */
@@ -259,7 +259,7 @@ export function create(api) {
     g.add(bead);
     // Knot-order step glyph from CORD_ORDER
     const cordStep = CORD_ORDER.indexOf(i);
-    const stepGlyph = cordStep >= 0 ? ['①', '②', '③'][cordStep] : '·';
+    const stepGlyph = cordStep >= 0 ? ['첫', '둘', '셋'][cordStep] : '·';
     const stepPlaque = new THREE.Mesh(
       new THREE.BoxGeometry(0.04, 0.028, 0.006),
       makeRulePlaque(stepGlyph, 64, 32),
@@ -461,7 +461,7 @@ export function create(api) {
       title: '의궤함 · 기록 쪽지',
       body: '문서함과 봉인 끈이 풀리자 실측 기록이 나왔다. 「장인의 다섯 궤 — 뒤주·혼수함·문갑·이층농·의궤함 — 실측 서고의 문을 모두 열었다」.',
       footer: '— 장인의 실측 서고 · 의궤함',
-      epilogue: '제15장 의궤함 — 해제 완료 · DLC 완주',
+      epilogue: '제15장 의궤함 — 해제 완료 · 서고 완주',
     });
     api.markCleared(id);
   }

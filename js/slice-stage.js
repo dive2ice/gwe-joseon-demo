@@ -97,7 +97,7 @@ export function createSliceStage(scene, renderer, mats) {
       }
     } else {
       ctx.fillStyle = '#3e4439'; ctx.font = '36px serif';
-      const texts = kind === 'herbs' ? ['藥','草','本'] : kind === 'ward' ? ['守','門','安'] : ['工','記','錄']; texts.forEach((text,i) => ctx.fillText(text,475,110+i*100));
+      const texts = kind === 'herbs' ? ['약초','풀잎','뿌리'] : kind === 'ward' ? ['지킴','문','평안'] : ['작업','기록','보관']; texts.forEach((text,i) => ctx.fillText(text,475,110+i*100));
       for (let i=0;i<11;i++) { ctx.beginPath();ctx.moveTo(75+i*26,80);ctx.lineTo(70+i*26,365-i%3*33);ctx.stroke(); }
       ctx.fillStyle = '#843a2b'; ctx.fillRect(467,380,45,45);
     }

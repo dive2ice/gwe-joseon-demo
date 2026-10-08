@@ -1,7 +1,7 @@
 import { attachBlenderFinish } from './blender-finish.js';
 import { PART_MARKS } from './inventory.js';
 /**
- * 궤(櫃) : 조선의 비밀 — multi-chapter greybox prototype
+ * 궤 : 조선의 비밀 — multi-chapter greybox prototype
  * Hub + chapter lifecycle · OrbitControls · raycast
  * Ch1 flagship: hold-handle, craft-eye, richer SFX/lighting
  */
@@ -14,12 +14,12 @@ import {
   playNacreClick, playNacreChime, playRubPaper,
 } from './audio.js';
 import { createMaterials } from './materials.js';
-import { createSliceStage } from './slice-stage.js';
+import { createSliceStage } from './slice-stage.js?v=ko-20261008';
 import { createSliceExperience } from './slice-experience.js';
 import { createCampaignCinematics } from './campaign-cinematics.js';
 import { playStoryCue } from './audio.js';
 import { createAnimSystem, prefersReducedMotion } from './anim.js';
-import { CHAPTER_META, createChapter, MAIN_CHAPTER_IDS, DLC_CHAPTER_IDS } from './chapters/index.js';
+import { CHAPTER_META, createChapter, MAIN_CHAPTER_IDS, DLC_CHAPTER_IDS } from './chapters/index.js?v=ko-20261008';
 import {
   PARTS, grantAllParts, getOwnedParts,
 } from './inventory.js';

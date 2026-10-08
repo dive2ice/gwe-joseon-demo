@@ -23,9 +23,9 @@ export const id = 10;
 export const title = '태극 옥좌 밀실 궤';
 export const blurb = '아홉 놋쇠·그림자 투영·무정 코어로 밀실을 열고 의금부에 전하시오.';
 export const steps = [
-  { id: 'A', label: 'A 아홉쇠' },
-  { id: 'B', label: 'B 그림자' },
-  { id: 'C', label: 'C 무정' },
+  { id: 'A', label: '아홉쇠' },
+  { id: 'B', label: '그림자' },
+  { id: 'C', label: '무정' },
   { id: 'D', label: '결말' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -59,26 +59,26 @@ export const ENDINGS = [
   {
     id: 'direct',
     label: '직접 의금부에 올리기',
-    title: '결말 甲 · 직소',
+    title: '첫째 결말 · 직소',
     body: '사천장은 증거를 품에 안고 의금부 대문으로 향했다. 심문은 혹독했으나, 여섯—아니 열 궤에서 나온 서찰은 거짓을 이길 수 없었다. 세자의 원한이 조정에 울렸다.',
     footer: '— 의금부 직소 기록',
-    epilogue: '엔딩 A: 직접 고발 · 조정이 흔들린다',
+    epilogue: '첫째 결말: 직접 고발 · 조정이 흔들린다',
   },
   {
     id: 'envoy',
     label: '밀사로 전하기',
-    title: '결말 乙 · 밀사',
+    title: '둘째 결말 · 밀사',
     body: '사천장은 믿을 수 있는 내관에게 봉함 서류를 맡겼다. 밀사는 밤길을 달려 의금부에 닿았고, 이름 없는 손으로 진실이 심어졌다. 다음 날, 조정은 조용히 뒤집히기 시작했다.',
     footer: '— 밀사 봉함 기록',
-    epilogue: '엔딩 B: 밀사 전달 · 그림자가 먼저 움직인다',
+    epilogue: '둘째 결말: 밀사 전달 · 그림자가 먼저 움직인다',
   },
   {
     id: 'seal',
     label: '서고에 다시 봉인',
-    title: '결말 丙 · 봉인',
+    title: '셋째 결말 · 봉인',
     body: '사천장은 아직 때가 아니라 판단했다. 아홉 놋쇠와 서찰을 태극 옥좌 밀실에 다시 봉인하고, 「후일의 사천장에게」라는 쪽지만 남겼다. 진실은 잠들었으나, 궤는 기다린다.',
     footer: '— 서고 봉인 기록',
-    epilogue: '엔딩 C: 재봉인 · 비밀은 대를 잇는다',
+    epilogue: '셋째 결말: 재봉인 · 비밀은 대를 잇는다',
   },
 ];
 

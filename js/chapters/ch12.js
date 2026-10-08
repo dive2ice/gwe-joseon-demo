@@ -18,8 +18,8 @@ export const id = 12;
 export const title = '혼수함';
 export const blurb = '보자기 겹을 올바른 순서로 풀고 자물쇠와 비밀칸을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 보자기' },
-  { id: 'B', label: 'B 자물쇠' },
+  { id: 'A', label: '보자기' },
+  { id: 'B', label: '자물쇠' },
   { id: 'C', label: '비밀칸' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -27,7 +27,7 @@ export const hint = '세 겹은 닫혀 있소. 가르침 겹의 가장자리 견
 export const HINT_PARTIAL = '겹은 접힘 축을 따라 당기시오. 견본의 막대와 옷감 가장자리의 막대가 같은 겹이 다음이오.';
 export const HINT_RELATION = '열림 각에 못 미치면 겹은 머물지 않습니다. 순서가 아닌 겹은 되돌아갑니다. 세 겹 다음이 자물쇠입니다.';
 /** Spoiler: flap indices */
-export const HINT_FULL = '정답: 보자기 [1, 0, 2] (청→적→황) — 그다음 자물쇠·비밀칸';
+export const HINT_FULL = '정답: 보자기 청→적→황 — 그다음 자물쇠·비밀칸';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Correct fold unwrap order (indices of three bojagi flaps) */

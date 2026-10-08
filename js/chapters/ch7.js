@@ -18,9 +18,9 @@ export const id = 7;
 export const title = '벽사도 함';
 export const blurb = '부적 찍기·목판 글자 회전·미니어처 검 빗장으로 함을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 부적' },
-  { id: 'B', label: 'B 목판' },
-  { id: 'C', label: 'C 검빗장' },
+  { id: 'A', label: '부적' },
+  { id: 'B', label: '목판' },
+  { id: 'C', label: '검빗장' },
 ];
 
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -159,7 +159,7 @@ export function create(api) {
   // Front panel plaque frame (부적 area sits on lid)
   bodyGroup.add(boxMesh(THREE, 0.36, 0.012, 0.02, brass, -0.22, lidY + 0.04, 0.12));
 
-  // Hanja plaque helper for wood-block characters
+  // Korean plaque helper for wood-block characters
   function makeCharPlaque(text) {
     try {
       const c = document.createElement('canvas');
@@ -341,7 +341,7 @@ export function create(api) {
   blot.visible = false;
   root.add(blot);
 
-  // ---- Wood-block characters (목판) — denser blocks with Hanja plaques ----
+  // ---- Wood-block characters (목판) — denser blocks with Korean plaques ----
   const labels = ['벽', '사', '도'];
   const charXs = [0.05, 0.24, 0.43];
   // Rail under characters
@@ -366,7 +366,7 @@ export function create(api) {
     g.add(block);
     // Brass rim edge
     g.add(boxMesh(THREE, 0.145, 0.01, 0.145, brass, 0, -0.02, 0));
-    // Hanja face plaque
+    // Korean face plaque
     const plaqueMat = makeCharPlaque(label);
     const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.01, 0.1), plaqueMat);
     plaque.position.y = 0.03;

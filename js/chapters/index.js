@@ -1,19 +1,19 @@
 /** Chapter registry */
-import * as ch1 from './ch1.js';
-import * as ch2 from './ch2.js';
-import * as ch3 from './ch3.js';
-import * as ch4 from './ch4.js';
-import * as ch5 from './ch5.js';
-import * as ch6 from './ch6.js';
-import * as ch7 from './ch7.js';
-import * as ch8 from './ch8.js';
-import * as ch9 from './ch9.js';
-import * as ch10 from './ch10.js';
-import * as ch11 from './ch11.js';
-import * as ch12 from './ch12.js';
-import * as ch13 from './ch13.js';
-import * as ch14 from './ch14.js';
-import * as ch15 from './ch15.js';
+import * as ch1 from './ch1.js?v=ko-20261008';
+import * as ch2 from './ch2.js?v=ko-20261008';
+import * as ch3 from './ch3.js?v=ko-20261008';
+import * as ch4 from './ch4.js?v=ko-20261008';
+import * as ch5 from './ch5.js?v=ko-20261008';
+import * as ch6 from './ch6.js?v=ko-20261008';
+import * as ch7 from './ch7.js?v=ko-20261008';
+import * as ch8 from './ch8.js?v=ko-20261008';
+import * as ch9 from './ch9.js?v=ko-20261008';
+import * as ch10 from './ch10.js?v=ko-20261008';
+import * as ch11 from './ch11.js?v=ko-20261008';
+import * as ch12 from './ch12.js?v=ko-20261008';
+import * as ch13 from './ch13.js?v=ko-20261008';
+import * as ch14 from './ch14.js?v=ko-20261008';
+import * as ch15 from './ch15.js?v=ko-20261008';
 
 export const CHAPTER_MODULES = [
   ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10,

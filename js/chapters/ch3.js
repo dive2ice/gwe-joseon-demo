@@ -15,14 +15,14 @@ import { boxMesh, bevelBoxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
 
 import { createOpeningArt } from './opening-art.js';
-import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js';
+import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=ko-20261008';
 
 export const id = 3;
 export const title = '어보 궤';
 export const blurb = '오방색 다이얼과 태극 톱니로 어보 함을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 오방색' },
-  { id: 'B', label: 'B 태극' },
+  { id: 'A', label: '오방색' },
+  { id: 'B', label: '태극' },
   { id: 'C', label: '어보' },
 ];
 
@@ -232,7 +232,7 @@ export function create(api) {
   // Brass ring frame behind plaques
   addLid(boxMesh(THREE, 0.9, 0.006, 0.05, brass, 0, plaqueY - 0.004, -0.12));
 
-  // Hanja / color plaque helper for dials
+  // Color plaque helper for dials
   function makeColorPlaque(text, fillHex) {
     try {
       const c = document.createElement('canvas');
@@ -309,7 +309,7 @@ export function create(api) {
     disc.castShadow = true;
     disc.userData = { id: c.key, kind: 'dial', index: i };
     g.add(disc);
-    // Hanja / color plaque on face
+    // Color plaque on face
     const plaqueMat = makeColorPlaque(c.name, c.hex);
     const plaque = new THREE.Mesh(new THREE.CircleGeometry(0.028, 20), plaqueMat);
     plaque.position.z = 0.018;

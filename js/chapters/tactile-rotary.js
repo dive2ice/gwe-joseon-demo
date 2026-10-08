@@ -57,7 +57,7 @@ export function pullDrag({ read, write, ready, confirm, threshold = 0.045, maxim
     cancel() { write(before); },
   };
 }
-export const MOTIFS = ['月', '山', '水', '雲'];
+export const MOTIFS = ['달', '산', '물', '구름'];
 export function stopMotif(index, stop, target) { return MOTIFS[((stop - target + index) % 4 + 4) % 4]; }
 export function motifPlaque(THREE, text, fallback, width = 0.028, height = 0.028) {
   let material = fallback;

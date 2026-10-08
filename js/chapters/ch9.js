@@ -20,9 +20,9 @@ export const id = 9;
 export const title = '규표 시계 궤';
 export const blurb = '진주 낙하·톱니 복원·추 균형으로 규표 시계를 맞추시오.';
 export const steps = [
-  { id: 'A', label: 'A 진주' },
-  { id: 'B', label: 'B 톱니' },
-  { id: 'C', label: 'C 추' },
+  { id: 'A', label: '진주' },
+  { id: 'B', label: '톱니' },
+  { id: 'C', label: '추' },
 ];
 
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */

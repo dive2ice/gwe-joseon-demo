@@ -18,8 +18,8 @@ export const id = 14;
 export const title = '이층농';
 export const blurb = '상·하층을 순서대로 열고 다리 속 숨은 핀으로 쪽지를 찾으시오.';
 export const steps = [
-  { id: 'A', label: 'A 층문' },
-  { id: 'B', label: 'B 핀' },
+  { id: 'A', label: '층문' },
+  { id: 'B', label: '숨은 핀' },
   { id: 'C', label: '쪽지' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -27,7 +27,7 @@ export const hint = '이층농 적층 패를 살피시오. · 상층 문은 이�
 export const HINT_PARTIAL = '적층 순서로 위 → 아래. 상층을 먼저 연 뒤 하층을…';
 export const HINT_RELATION = '위가 열린 뒤에야 아래가 산다. 적층 패가 그 순서를 이른다.';
 /** Spoiler: tier ids */
-export const HINT_FULL = '층문 순서: 상 → 하 (UPPER→LOWER) — 그다음 다리 핀·쪽지';
+export const HINT_FULL = '층문 순서: 위 → 아래 — 그다음 다리 속 핀과 쪽지';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Correct open order of tiers */

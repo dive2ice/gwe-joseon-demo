@@ -20,9 +20,9 @@ export const id = 8;
 export const title = '수문장 병풍 궤';
 export const blurb = '병풍을 접고 먹선 배선·접힘각으로 밀실을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 병풍' },
-  { id: 'B', label: 'B 먹선' },
-  { id: 'C', label: 'C 접힘각' },
+  { id: 'A', label: '병풍' },
+  { id: 'B', label: '먹선' },
+  { id: 'C', label: '접힘각' },
 ];
 
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -255,7 +255,7 @@ export function create(api) {
 
   const crestPlaque = new THREE.Mesh(
     new THREE.PlaneGeometry(0.28, 0.08),
-    makeCrestPlaque('수문장 · 墨線'),
+    makeCrestPlaque('수문장 · 먹선'),
   );
   crestPlaque.position.set(0, bodyY0 + BODY_H * 0.55, frontZ + 0.025);
   bodyGroup.add(crestPlaque);
@@ -342,7 +342,7 @@ export function create(api) {
     // Hint glyph on back (visible when folded open) — crest path step teaches wire order
     const hintMark = new THREE.Mesh(
       new THREE.BoxGeometry(0.09, 0.09, 0.008),
-      makeInkPlaque(['左', '中', '右'][i]),
+      makeInkPlaque(['왼쪽', '가운데', '오른쪽'][i]),
     );
     hintMark.position.set(0, PANEL_H * 0.55, -PANEL_D / 2 - 0.006);
     hintMark.visible = false;
@@ -525,7 +525,7 @@ export function create(api) {
   // Tiny 접힘각 label plaque on dial mount
   const foldLabel = new THREE.Mesh(
     new THREE.PlaneGeometry(0.12, 0.035),
-    makeCrestPlaque('接 · 접힘각'),
+    makeCrestPlaque('접힘각'),
   );
   foldLabel.position.set(0, -0.045, 0.06);
   foldDial.add(foldLabel);

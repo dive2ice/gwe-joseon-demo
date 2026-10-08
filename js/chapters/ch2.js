@@ -17,8 +17,8 @@ export const id = 2;
 export const title = '나전흑칠 연상';
 export const blurb = '영롱한 자개를 달빛 쪽으로 돌리고, 탁본으로 묵함을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 자개' },
-  { id: 'B', label: 'B 탁본' },
+  { id: 'A', label: '자개' },
+  { id: 'B', label: '탁본' },
   { id: 'C', label: '묵함' },
 ];
 
@@ -26,7 +26,7 @@ export const steps = [
 export const hint = '자개에 남은 방향과 등잔 아래 문양의 관계를 살피시오.';
 export const HINT_PARTIAL = '빛이 모이는 쪽으로 끝을 돌리시오';
 /** Spoiler: quarter-turns 0–3 for N/E/S/W — tips face center (inward) */
-export const HINT_FULL = '정답 각도(¼회전): N=0 · E=1 · S=2 · W=3 — 끝이 중앙 등잔을 향함';
+export const HINT_FULL = '정답 각도(한 칸씩 회전): 북=0 · 동=1 · 남=2 · 서=3 — 끝이 중앙 등잔을 향함';
 
 /**
  * Target rotations in quarter-turns (0–3) for pieces N, E, S, W.

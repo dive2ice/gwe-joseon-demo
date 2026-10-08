@@ -19,14 +19,14 @@
 import { boxMesh, bevelBoxMesh, invisibleHit } from '../materials.js';
 import { craftPalette, addRaisedPanel, disposeCraftRoot } from '../campaign-craft-art.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
-import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js';
+import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=ko-20261008';
 
 export const id = 6;
 export const title = '혼천의 궤';
 export const blurb = '혼천의 고리와 별표를 성좌에 맞추시오. (별칭: 비천궤)';
 export const steps = [
-  { id: 'A', label: 'A 고리' },
-  { id: 'B', label: 'B 별표' },
+  { id: 'A', label: '고리' },
+  { id: 'B', label: '별표' },
   { id: 'C', label: '종장' },
 ];
 
@@ -35,7 +35,7 @@ export const hint = '받침의 고리 문양과 성좌 패의 짝을, 구슬과 
 export const HINT_PARTIAL = '고리는 바깥·가운데·안쪽의 문양, 별은 패에 새긴 앞줄·뒷줄 문양을 따릅니다.';
 export const HINT_RELATION = '세 고리의 문양이 맞는 동안만 별이 돕니다. 별 첨도 대응 문양으로 돌린 뒤 앞 빗장을 아래로 당기시오.';
 /** Spoiler: ring + star quarter-turn indices */
-export const HINT_FULL = '바깥 고리 月, 가운데 山, 안쪽 水. 앞줄 별은 月·山, 뒷줄은 水·雲에 첨을 두고 빗장을 아래로 당기시오.';
+export const HINT_FULL = '바깥 고리 달, 가운데 산, 안쪽 물. 앞줄 별은 달·산, 뒷줄은 물·구름에 첨을 두고 빗장을 아래로 당기시오.';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Armillary ring target indices (0–3 each) */
@@ -67,6 +67,7 @@ export function create(api) {
   let hintLevel = 0;
   const interactives = [];
   const ringMeshes = [];
+  const ringBeads = [];
   const starMeshes = [];
   const ringTicks = [];
   const starGuideMarks = [];
@@ -203,7 +204,7 @@ export function create(api) {
     }
   }
   const ruleY = lidY + 0.055;
-  ['바깥 · 月', '가운데 · 山', '안쪽 · 水'].forEach((label, i) => {
+  ['바깥 · 달', '가운데 · 산', '안쪽 · 물'].forEach((label, i) => {
     const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 0.035), makeRulePlaque(label));
     pl.rotation.x = -Math.PI / 2;
     pl.position.set(-0.22 + i * 0.22, ruleY, -0.28);
@@ -290,6 +291,7 @@ export function create(api) {
     bead.position.set(ringRadii[i], 0, 0);
     bead.userData = { id: `R${i}`, kind: 'ring', index: i };
     g.add(bead);
+    ringBeads.push(bead);
     // Small notch opposite
     const notch = boxMesh(THREE, 0.02, 0.012, 0.012, brass, -ringRadii[i], 0, 0);
     notch.userData = { id: `R${i}`, kind: 'ring', index: i };
@@ -401,7 +403,7 @@ export function create(api) {
     ctx.font = 'bold 14px serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('앞 月·山 / 뒤 水·雲', 80, 19);
+    ctx.fillText('앞 달·산 / 뒤 물·구름', 80, 19, 150);
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     const plMat = new THREE.MeshStandardMaterial({
@@ -639,7 +641,7 @@ export function create(api) {
       api.showFinale({
         title: '종장 · 세자의 유언',
         body: '혼천의 궤(비천궤)에서 편지가 나왔다. 「사천장이어, 네 손이 열어 준 결구는 곧 진실의 열쇠다. 그러나 아직 남은 궤가 있으니 — 벽사·수문·규표·옥좌를 이으며 증거를 완성하라.」',
-        footer: '— 세자 친필 · 궤(櫃) 완결',
+        footer: '— 세자 친필 · 궤 완결',
         epilogue: '제6장 혼천의 궤 — 해제 완료',
       });
       api.markCleared(id);
@@ -715,10 +717,7 @@ export function create(api) {
       const ticks = ringTicks.map((t) => ({
         ...at(t), ring: t.userData.ring, stop: t.userData.stop, target: !!t.userData.target,
       }));
-      const beads = ringMeshes.map((group, i) => {
-        const bead = group.children.find((c) => c.geometry && c.geometry.type === 'SphereGeometry');
-        return { ...at(bead), ring: i };
-      });
+      const beads = ringBeads.map((bead, i) => ({ ...at(bead), ring: i }));
       const grooves = starGuideMarks.map((g) => ({
         ...at(g), star: g.userData.star, stop: g.userData.stop, target: !!g.userData.target,
       }));

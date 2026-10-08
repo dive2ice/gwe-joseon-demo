@@ -14,9 +14,9 @@ export const id = 1;
 export const title = '반닫이';
 export const blurb = '사개맞춤·놋쇠 핀·들쇠·빗장으로 비밀 서랍을 여시오.';
 export const steps = [
-  { id: 'A', label: 'A 짜맞춤' },
-  { id: 'B', label: 'B 들쇠' },
-  { id: 'C', label: 'C 빗장' },
+  { id: 'A', label: '짜맞춤' },
+  { id: 'B', label: '들쇠' },
+  { id: 'C', label: '빗장' },
   { id: 'D', label: '비밀' },
 ];
 /** Non-spoiler footer; full order via hint button / after first mistake */

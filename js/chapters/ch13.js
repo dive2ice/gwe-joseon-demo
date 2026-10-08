@@ -1,7 +1,7 @@
 /**
  * Chapter 13 — 문갑 (DLC · 장인의 실측 서고)
  *
- * Discoverable rule: 서랍은 필순(筆順) 좌→우 (DRAWER_ORDER LEFT→RIGHT);
+ * Discoverable rule: 서랍은 필순 좌→우 (DRAWER_ORDER LEFT→RIGHT);
  * 우 서랍은 좌가 열린 뒤에야 풀린다 — readable on the 필순 plaque.
  * Teaching: LEFT starts slightly ajar.
  * Soft-fail never advances hints. Hints: request-only observe → relate → FULL.
@@ -15,10 +15,10 @@ import { archivePalette, mechanismFrame } from './archive-craft.js';
 
 export const id = 13;
 export const title = '문갑';
-export const blurb = '가벼운 서랍 인터락과 문 장부못으로 편지를 찾으시오.';
+export const blurb = '서랍을 순서대로 열고 장부못을 돌려 편지를 찾으시오.';
 export const steps = [
-  { id: 'A', label: 'A 서랍' },
-  { id: 'B', label: 'B 장부' },
+  { id: 'A', label: '서랍' },
+  { id: 'B', label: '장부못' },
   { id: 'C', label: '편지' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
@@ -26,7 +26,7 @@ export const hint = '문갑 필순 패를 살피시오. · 좌 서랍은 이미 
 export const HINT_PARTIAL = '서랍은 필순대로 좌 → 우. 그다음 닳은 장부못 눈금에…';
 export const HINT_RELATION = '좌가 열린 뒤에야 우가 산다. 필순 패가 그 순서를 이른다.';
 /** Spoiler: drawer ids + peg index */
-export const HINT_FULL = '서랍 순서: 좌 → 우 (LEFT→RIGHT) · 장부못 칸 1';
+export const HINT_FULL = '서랍 순서: 좌 → 우 · 장부못 둘째 눈금';
 const HINT_PACK = { base: hint, partial: HINT_PARTIAL, relation: HINT_RELATION, full: HINT_FULL };
 
 /** Light drawer interlock order */
@@ -363,7 +363,7 @@ export function create(api) {
       api.setObjective('닳은 장부못 눈금에 맞춰 돌리시오.');
       api.setSteps('B', ['A']);
       api.playUnlock();
-      api.toast('서랍 필순 인터락이 풀렸습니다.', true);
+      api.toast('서랍을 막던 걸림쇠가 풀렸습니다.', true);
     } else {
       api.toast(`${drawers[did].label} 서랍 개방 (${progress.length}/2) · 필순을 따르시오`, true);
     }
@@ -415,7 +415,7 @@ export function create(api) {
     api.vibrate([40, 25, 70]);
     api.showFinale({
       title: '문갑 · 편지',
-      body: '가벼운 서랍 인터락과 문 장부못이 풀리자 편지가 나왔다. 「이층농은 위·아래 순서를 지키라. 다리 속을 살필 것」.',
+      body: '서랍의 걸림쇠와 문 장부못이 풀리자 편지가 나왔다. 「이층농은 위·아래 순서를 지키라. 다리 속을 살필 것」.',
       footer: '— 장인의 실측 서고 · 문갑',
       epilogue: '제13장 문갑 — 해제 완료',
     });
