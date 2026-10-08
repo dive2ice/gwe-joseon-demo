@@ -1,7 +1,7 @@
 /**
  * Chapter 11 — 뒤주 (DLC · 장인의 실측 서고)
  *
- * Latch: the hasp turns with a downward drag. Weight phase starts only when
+ * Latch: the hasp turns about its physical Z axis (pixel fallback for legacy samples). Weight phase starts only when
  * hasp.rotation.z reaches LATCH_OPEN (0.8 rad). LATCH_CLICKS is not the gate,
  * and the n/2 toast is gone. A short drag stays in latch.
  * Weight: one drag along the beam (+X, screen-right on the chapter camera)
@@ -10,8 +10,10 @@
  * Soft-fail never advances hints. Hints: request-only observe → relate → FULL.
  * Phases: latch → weight → bottom → finale.
  */
-import { boxMesh, invisibleHit } from '../materials.js';
+import { bevelBoxMesh as boxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
+import { disposeChapterResources } from '../chapter-resources.js';
+import { archivePalette, mechanismFrame } from './archive-craft.js';
 
 export const id = 11;
 export const title = '뒤주';
@@ -56,12 +58,13 @@ export function create(api) {
   let hintLevel = 0;
   const interactives = [];
 
-  const woodMat = mats.woodRich || mats.wood;
-  const woodDark = mats.woodDark;
-  const woodAcc = mats.woodAccent || woodMat;
+  const palette = archivePalette(mats);
+  const woodMat = palette.wood;
+  const woodDark = palette.dark;
+  const woodAcc = palette.wood;
   const lacquer = mats.lacquer || woodDark;
-  const brass = mats.brass;
-  const brassB = mats.brassBright || brass;
+  const brass = palette.brass;
+  const brassB = palette.bright;
   const iron = mats.iron;
 
   // ---- Tall grain chest carcass (뒤주) ----
@@ -79,7 +82,7 @@ export function create(api) {
   });
   // Front panel inset
   bodyGroup.add(boxMesh(THREE, BODY_W - 0.1, BODY_H - 0.16, 0.02, woodMat,
-    0, bodyY0 + BODY_H / 2, BODY_D / 2 - 0.01));
+    0, bodyY0 + BODY_H / 2, BODY_D / 2 - 0.004));
   // Vertical stiles
   [-1, 1].forEach((sx) => {
     bodyGroup.add(boxMesh(THREE, 0.04, BODY_H - 0.1, 0.03, woodAcc,
@@ -280,6 +283,9 @@ export function create(api) {
   const wHit = invisibleHit(THREE, 0.18, 0.2, 0.18, { id: 'WEIGHT', kind: 'weight' });
   weightPivot.add(wHit);
   interactives.push(weight, wHit, wRing);
+  // Rear bearing is the lid's real pivot, including the moving balance beam.
+  for (const child of lid.children) child.position.z += BODY_D / 2;
+  lid.position.z = -BODY_D / 2;
 
   // ---- False bottom (crafted panel) ----
   const falseBottom = new THREE.Group();
@@ -297,7 +303,7 @@ export function create(api) {
   falseBottom.add(bottomPanel);
   falseBottom.add(boxMesh(THREE, 0.25, 0.145, 0.008, woodDark, 0, 0, -0.012));
   falseBottom.add(boxMesh(THREE, 0.07, 0.012, 0.012, brassB, 0, 0.03, 0.012));
-  const note = boxMesh(THREE, 0.12, 0.06, 0.006, mats.paper, 0, -0.01, 0.014);
+  const note = boxMesh(THREE, 0.12, 0.06, 0.006, mats.slicePaper || mats.paper, 0, -0.01, 0.014);
   note.visible = false;
   falseBottom.add(note);
   const bHit = invisibleHit(THREE, 0.26, 0.16, 0.06, { id: 'BOTTOM', kind: 'bottom' });
@@ -445,7 +451,8 @@ export function create(api) {
 
   return {
     id, title, blurb, steps, hint, root,
-    getInteractives: () => interactives,
+    getInteractives: () => interactives.filter(m => phase === 'latch' ? m.userData.kind === 'latch' :
+      phase === 'weight' ? m.userData.kind === 'weight' : phase === 'bottom' ? ['weight', 'bottom'].includes(m.userData.kind) : false),
     getMarkMeshes: () => [...beamTicks, ...latchTicks, dropRing, weight, falseBottom],
     build(scene) { scene.add(root); },
     start() { this.reset(); },
@@ -467,14 +474,19 @@ export function create(api) {
       if (api.setOrderHint) api.setOrderHint(hint);
       api.toast('뒤주 — 걸쇠의 각과 균형보를 살피시오.', true);
     },
+    getGestureFrame(kind) {
+      if (kind === 'latch') return mechanismFrame(THREE, hasp, 'rotate', [0, 0, 1]);
+      if (kind === 'weight') return mechanismFrame(THREE, weightPivot, 'linear', [1, 0, 0]);
+      if (kind === 'bottom') return mechanismFrame(THREE, falseBottom, 'linear', [0, 1, 0]);
+    },
     getDragInteraction(kind) {
       if (kind === 'latch') {
         if (phase !== 'latch') return null;
         let origin = 0;
         return {
           start() { origin = hasp.rotation.z; },
-          move(s) { applyLatch(origin + (s.dy || 0) * LATCH_RAD_PER_PX); },
-          end(s) { applyLatch(origin + (s?.dy || 0) * LATCH_RAD_PER_PX); },
+          move(s) { hasp.rotation.z = Math.max(0, Math.min(LATCH_OPEN, origin + (s.turn ?? (s.dy || 0) * LATCH_RAD_PER_PX))); },
+          end(s) { applyLatch(origin + (s?.turn ?? (s?.dy || 0) * LATCH_RAD_PER_PX)); },
           cancel() { hasp.rotation.z = origin; },
         };
       }
@@ -485,12 +497,12 @@ export function create(api) {
         return {
           start() { origin = weightIndex; along = 0; },
           move(s) {
-            along = s.dx || 0;
+            along = s.travel === undefined ? s.dx || 0 : s.travel * WEIGHT_STEP_PX / .15;
             const steps = Math.max(-1, Math.min(1, along / WEIGHT_STEP_PX));
             placeWeight(Math.max(0, Math.min(WEIGHT_STEPS - 1, origin + steps)));
           },
           end(s) {
-            along = s?.dx ?? along;
+            along = s?.travel === undefined ? s?.dx ?? along : s.travel * WEIGHT_STEP_PX / .15;
             const prev = origin;
             if (Math.abs(along) >= WEIGHT_STEP_PX) {
               const dir = along > 0 ? 1 : -1;
@@ -501,6 +513,13 @@ export function create(api) {
             onWeight(prev);
           },
           cancel() { placeWeight(origin); },
+        };
+      }
+      if (kind === 'bottom' && phase === 'bottom' && weightHeld()) {
+        return {
+          move(s) { falseBottom.position.y = BOTTOM_SHOWN.y + Math.max(0, Math.min(.14, s.travel || 0)); },
+          end(s) { falseBottom.position.copy(BOTTOM_SHOWN); if ((s?.travel || 0) >= .09) onBottom(); },
+          cancel() { falseBottom.position.copy(BOTTOM_SHOWN); },
         };
       }
       return null;
@@ -534,6 +553,6 @@ export function create(api) {
       onWeight(-1);
       onBottom();
     },
-    dispose(scene) { scene.remove(root); interactives.length = 0; },
+    dispose(scene) { scene.remove(root); disposeChapterResources(root, mats); interactives.length = 0; },
   };
 }

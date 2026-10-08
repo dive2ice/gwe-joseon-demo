@@ -8,8 +8,10 @@
  * Phases: drawers → peg → letter → finale.
  * Visual: Joseon stationery chest — shallow yakjang-adjacent grid, brass ring pulls, densified peg/letter.
  */
-import { boxMesh, invisibleHit } from '../materials.js';
+import { bevelBoxMesh as boxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
+import { disposeChapterResources } from '../chapter-resources.js';
+import { archivePalette, mechanismFrame } from './archive-craft.js';
 
 export const id = 13;
 export const title = '문갑';
@@ -54,12 +56,13 @@ export function create(api) {
   const interactives = [];
   const drawers = {};
 
-  const woodMat = mats.woodRich || mats.wood;
-  const woodDark = mats.woodDark;
-  const woodAcc = mats.woodAccent || woodMat;
+  const palette = archivePalette(mats);
+  const woodMat = palette.wood;
+  const woodDark = palette.dark;
+  const woodAcc = palette.wood;
   const lacquer = mats.lacquer || woodDark;
-  const brass = mats.brass;
-  const brassB = mats.brassBright || brass;
+  const brass = palette.brass;
+  const brassB = palette.bright;
   const iron = mats.iron;
 
   // ---- Shallow stationery chest (문갑) — yakjang-adjacent ----
@@ -134,8 +137,8 @@ export function create(api) {
   // Quiet upper small-drawer row (decorative)
   for (let c = 0; c < 4; c++) {
     const cx = -0.36 + c * 0.24;
-    const cy = bodyY0 + BODY_H - 0.12;
-    bodyGroup.add(boxMesh(THREE, 0.2, 0.1, 0.04, woodMat, cx, cy, frontZ - 0.01));
+    const cy = bodyY0 + BODY_H - 0.05;
+    bodyGroup.add(boxMesh(THREE, 0.2, 0.07, 0.04, woodMat, cx, cy, frontZ - 0.004));
     const pull = ringPull(brass, 0.7);
     pull.position.set(cx, cy - 0.02, frontZ + 0.015);
     bodyGroup.add(pull);
@@ -213,7 +216,7 @@ export function create(api) {
 
   // ---- Door panel with densified joinery peg ----
   const door = new THREE.Group();
-  door.position.set(0, 0.55, 0.12);
+  door.position.set(0, 0.55, 0.215);
   root.add(door);
   const doorFace = boxMesh(THREE, 0.85, 0.28, 0.06, woodDark, 0, 0, 0);
   door.add(doorFace);
@@ -256,22 +259,32 @@ export function create(api) {
   const pegHit = invisibleHit(THREE, 0.14, 0.14, 0.14, { id: 'PEG', kind: 'peg' });
   peg.add(pegHit);
   interactives.push(pegShaft, pegHit, pegKnob);
-  // Worn peg scale ticks — brighter at PEG_TARGET
+  // Radial scale uses the same Z axis as the turning peg.
+  const pegMarks = [];
   for (let s = 0; s < PEG_STEPS; s++) {
     const isTarget = s === PEG_TARGET;
-    door.add(boxMesh(THREE, isTarget ? 0.035 : 0.022, isTarget ? 0.008 : 0.005, 0.006,
-      isTarget ? brassB : iron, 0.18, -0.1 + s * 0.05, 0.04));
+    const a = s * Math.PI / 2;
+    const tick = boxMesh(THREE, .024, isTarget ? .014 : .008, .008,
+      isTarget ? brassB : iron, .3 + Math.cos(a) * .072, Math.sin(a) * .072, .06);
+    tick.rotation.z = a;
+    tick.userData = { kind: 'pegTick', role: isTarget ? 'worn' : 'tick', index: s };
+    door.add(tick); pegMarks.push(tick);
   }
+  const pointer = boxMesh(THREE, .06, .014, .012, brassB, .027, 0, .035);
+  peg.add(pointer); pegMarks.push(pointer);
   const pegLabel = new THREE.Mesh(
     new THREE.PlaneGeometry(0.1, 0.032),
     makeRulePlaque('장부', 64, 32),
   );
   pegLabel.position.set(0.18, -0.12, 0.05);
   door.add(pegLabel);
+  for (const child of door.children) child.position.x += .4;
+  door.position.x = -.4;
 
   // ---- Letter (revealed after peg) ----
   const letter = new THREE.Group();
-  letter.position.set(0, 0.55, 0.05);
+  letter.position.set(.18, .55, .72);
+  letter.rotation.x = .65;
   letter.visible = false;
   root.add(letter);
   letter.add(boxMesh(THREE, 0.28, 0.01, 0.2, mats.paper, 0, 0, 0));
@@ -356,7 +369,7 @@ export function create(api) {
     }
   }
 
-  function onPeg() {
+  function onPeg(nextIndex = pegIndex) {
     if (phase !== 'peg') {
       if (phase === 'drawers') {
         api.playWrong();
@@ -366,7 +379,7 @@ export function create(api) {
       }
       return;
     }
-    pegIndex = (pegIndex + 1) % PEG_STEPS;
+    pegIndex = THREE.MathUtils.euclideanModulo(nextIndex, PEG_STEPS);
     animateTo(peg.rotation, 'z', pegIndex * (Math.PI / 2), 160);
     api.playClick();
     api.vibrate(16);
@@ -413,7 +426,9 @@ export function create(api) {
 
   return {
     id, title, blurb, steps, hint, root,
-    getInteractives: () => interactives,
+    getInteractives: () => interactives.filter(m => phase === 'drawers' ? m.userData.kind === 'drawer' && !openSet.has(m.userData.id) :
+      phase === 'peg' ? m.userData.kind === 'peg' : phase === 'letter' ? m.userData.kind === 'letter' : false),
+    getMarkMeshes: () => pegMarks,
     build(scene) { scene.add(root); },
     start() { this.reset(); },
     reset() {
@@ -434,10 +449,36 @@ export function create(api) {
       if (api.setOrderHint) api.setOrderHint(hint);
       api.toast('문갑 — 필순 패와 서랍을 살피시오.', true);
     },
+    getGestureFrame(kind, iid) {
+      if (kind === 'drawer' && drawers[iid]) return mechanismFrame(THREE, drawers[iid].group, 'linear', [0, 0, 1]);
+      if (kind === 'peg') return mechanismFrame(THREE, peg, 'rotate', [0, 0, 1]);
+    },
+    getDragInteraction(kind, iid) {
+      if (kind === 'drawer' && phase === 'drawers' && drawers[iid] && !openSet.has(iid)) {
+        const d = drawers[iid]; let origin, travel = 0;
+        const unlocked = () => iid === DRAWER_ORDER[progress.length];
+        return {
+          start() { origin = d.group.position.z; travel = 0; },
+          move(s) { travel = s.travel || 0; if (unlocked()) d.group.position.z = Math.max(d.baseZ, Math.min(d.openZ, origin + travel)); },
+          end(s) { travel = s?.travel ?? travel; d.group.position.z = origin; if (travel >= (d.openZ - origin) * .7) onDrawer(iid); },
+          cancel() { d.group.position.z = origin; },
+        };
+      }
+      if (kind === 'peg' && phase === 'peg') {
+        let origin, turn = 0;
+        return {
+          start() { origin = peg.rotation.z; turn = 0; },
+          move(s) { turn = s.turn || 0; peg.rotation.z = origin + turn; },
+          end(s) { turn = s?.turn ?? turn; onPeg(Math.round((origin + turn) / (Math.PI / 2))); },
+          cancel() { peg.rotation.z = origin; },
+        };
+      }
+      return null;
+    },
     handleInteract(kind, iid) {
       if (phase === 'finale') return;
-      if (kind === 'drawer') onDrawer(iid);
-      else if (kind === 'peg') onPeg();
+      if (kind === 'drawer') api.toast('서랍 손잡이를 앞으로 당기시오. 필순은 좌에서 우로…');
+      else if (kind === 'peg') api.toast('장부못을 잡고 닳은 눈금까지 돌리시오.');
       else if (kind === 'letter') onLetter();
     },
     revealHint() {
@@ -446,7 +487,8 @@ export function create(api) {
     },
     get mistook() { return softFailCount > 0; },
     getState() {
-      return { phase, hintLevel };
+      return { phase, hintLevel, progress: [...progress], pegIndex, pegAngle: peg.rotation.z,
+        drawers: Object.fromEntries(Object.entries(drawers).map(([key, d]) => [key, d.group.position.z])) };
     },
     solve() {
       DRAWER_ORDER.forEach((did) => {
@@ -463,6 +505,6 @@ export function create(api) {
       phase = 'letter';
       onLetter();
     },
-    dispose(scene) { scene.remove(root); interactives.length = 0; },
+    dispose(scene) { scene.remove(root); disposeChapterResources(root, mats); interactives.length = 0; },
   };
 }

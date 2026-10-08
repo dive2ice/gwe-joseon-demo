@@ -180,7 +180,19 @@ function noteEvidence(id) {
   if (ledgerEl && !ledgerEl.classList.contains('hidden')) renderLedger(current ? current.id : null);
 }
 
+let finalePressArmed = false;
+// A touch release can open this sheet before its compatibility click is dispatched.
+// Keep that same release from activating the newly placed replay/ending button.
+finaleEl.addEventListener('pointerdown', () => { finalePressArmed = true; }, true);
+finaleEl.addEventListener('click', event => {
+  if (event.detail > 0 && !finalePressArmed) {
+    event.preventDefault(); event.stopImmediatePropagation();
+  }
+  finalePressArmed = false;
+}, true);
+
 function showFinale({ title, body, footer, epilogue, endings, onEnding, briefs, onBrief }) {
+  finalePressArmed = false;
   cinematics?.finish();
   finaleTitle.textContent = title;
   finaleBody.innerHTML = body;
@@ -739,7 +751,7 @@ function loadChapter(chapterId, { cinematic = true } = {}) {
   session.beginChapter(chapterId);
   const priorRoots=new Set(scene.children);
   current.build(scene);
-  if(chapterId<=10&&!new URLSearchParams(location.search).has('authoring'))blenderFinish=attachBlenderFinish(chapterId,scene.children.filter(root=>!priorRoots.has(root)));
+  if(!new URLSearchParams(location.search).has('authoring'))blenderFinish=attachBlenderFinish(chapterId,scene.children.filter(root=>!priorRoots.has(root)));
   syncSliceStage(chapterId);
   renderSteps(meta.steps);
   cinematics?.setChapter(chapterId);
@@ -760,8 +772,8 @@ function loadChapter(chapterId, { cinematic = true } = {}) {
   hudObjective.classList.remove('hidden');
   hudBottom.classList.remove('hidden');
   renderInventoryStrip(chapterId === 10);
-  // Every campaign chapter exposes its existing request-only hints.
-  setCh1ToolsVisible(chapterId >= 1 && chapterId <= 10);
+  // All fifteen chapters expose their request-only hints.
+  setCh1ToolsVisible(chapterId >= 1 && chapterId <= 15);
   if (btnCraftEye) {
     btnCraftEye.classList.toggle('hidden', !(chapterId === 1 || chapterId === 2 || chapterId === 4 || chapterId === 5));
   }

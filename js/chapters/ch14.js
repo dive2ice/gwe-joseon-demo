@@ -9,8 +9,10 @@
  * Visual: stacked Joseon nong — densified UPPER/LOWER doors with ring pulls,
  * carcass brackets/feet, crafted leg pin.
  */
-import { boxMesh, invisibleHit } from '../materials.js';
+import { bevelBoxMesh as boxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
+import { disposeChapterResources } from '../chapter-resources.js';
+import { archivePalette, mechanismFrame } from './archive-craft.js';
 
 export const id = 14;
 export const title = '이층농';
@@ -51,12 +53,13 @@ export function create(api) {
   const interactives = [];
   const tiers = {};
 
-  const woodMat = mats.woodRich || mats.wood;
-  const woodDark = mats.woodDark;
-  const woodAcc = mats.woodAccent || woodMat;
+  const palette = archivePalette(mats);
+  const woodMat = palette.wood;
+  const woodDark = palette.dark;
+  const woodAcc = palette.wood;
   const lacquer = mats.lacquer || woodDark;
-  const brass = mats.brass;
-  const brassB = mats.brassBright || brass;
+  const brass = palette.brass;
+  const brassB = palette.bright;
   const brassPin = mats.brassPin || brassB;
 
   // ---- Stacked two-tier nong carcass ----
@@ -181,7 +184,7 @@ export function create(api) {
   [-1, 1].forEach((sx) => {
     [upperY, lowerY].forEach((ty) => {
       bodyGroup.add(boxMesh(THREE, 0.18, 0.22, 0.035, woodMat,
-        sx * 0.32, ty, frontZ - 0.015));
+        sx * 0.32, ty, frontZ + 0.003));
       const quiet = ringPull(brass, 0.65);
       quiet.position.set(sx * 0.32, ty - 0.04, frontZ + 0.01);
       bodyGroup.add(quiet);
@@ -233,6 +236,9 @@ export function create(api) {
     });
     const hit = invisibleHit(THREE, 0.48, 0.36, 0.14, { id: t.id, kind: 'tier' });
     g.add(hit);
+    // Put the pivot on the right hinge while preserving the closed-door envelope.
+    for (const child of g.children) child.position.x -= .215;
+    g.position.x += .215;
     root.add(g);
     interactives.push(door, hit);
     pull.traverse((m) => { if (m.isMesh) interactives.push(m); });
@@ -306,7 +312,8 @@ export function create(api) {
 
   // ---- Crafted note ----
   const noteGroup = new THREE.Group();
-  noteGroup.position.set(0, 0.55, 0.1);
+  noteGroup.position.set(-.12, .55, .46);
+  noteGroup.rotation.x = .65;
   noteGroup.visible = false;
   root.add(noteGroup);
   noteGroup.add(boxMesh(THREE, 0.22, 0.01, 0.15, mats.paper, 0, 0, 0));
@@ -318,7 +325,7 @@ export function create(api) {
   noteGroup.add(noteHit);
   interactives.push(noteHit);
 
-  const AJAR_Y = -0.35; // teaching ajar rotation
+  const AJAR_Y = 0.35; // right hinge swings the left edge toward the player
 
   function softFailShake() {
     if (shake) shake(bodyGroup, 0.03, 360);
@@ -371,7 +378,7 @@ export function create(api) {
     openSet.add(tid);
     tiers[tid].open = true;
     badClicks = 0;
-    animateTo(tiers[tid].group.rotation, 'y', -1.1, 320);
+    animateTo(tiers[tid].group.rotation, 'y', 1.1, 320);
     api.playThunk();
     api.vibrate(26);
     if (progress.length === TIER_ORDER.length) {
@@ -425,7 +432,7 @@ export function create(api) {
     api.vibrate([45, 30, 80]);
     api.showFinale({
       title: '이층농 · 쪽지',
-      body: '상·하층을 순서대로 열고 다리 핀을 뽑자 쪽지가 나왔다. 「의궤함은 문서함 서랍을 밀고, 봉인 끈을 푸라」.',
+      body: '상·하층을 순서대로 열고 다리 핀을 뽑자 쪽지가 나왔다. 「의궤함은 문서 트레이를 당기고, 봉인 끈을 푸라」.',
       footer: '— 장인의 실측 서고 · 이층농',
       epilogue: '제14장 이층농 — 해제 완료',
     });
@@ -436,7 +443,8 @@ export function create(api) {
 
   return {
     id, title, blurb, steps, hint, root,
-    getInteractives: () => interactives,
+    getInteractives: () => interactives.filter(m => phase === 'tiers' ? m.userData.kind === 'tier' && !openSet.has(m.userData.id) :
+      phase === 'pin' ? m.userData.kind === 'pin' : phase === 'note' && noteGroup.visible ? m.userData.kind === 'note' : false),
     build(scene) { scene.add(root); },
     start() { this.reset(); },
     reset() {
@@ -454,10 +462,34 @@ export function create(api) {
       if (api.setOrderHint) api.setOrderHint(hint);
       api.toast('이층농 — 적층 패를 살피시오.', true);
     },
+    getGestureFrame(kind, iid) {
+      if (kind === 'tier' && tiers[iid]) return mechanismFrame(THREE, tiers[iid].group, 'rotate', [0, 1, 0]);
+      if (kind === 'pin') return mechanismFrame(THREE, pinGroup, 'linear', [0, 1, 0]);
+    },
+    getDragInteraction(kind, iid) {
+      if (kind === 'tier' && phase === 'tiers' && tiers[iid] && !openSet.has(iid)) {
+        const t = tiers[iid]; let origin, turn = 0;
+        return {
+          start() { origin = t.group.rotation.y; turn = 0; },
+          move(s) { turn = s.turn || 0; if (iid === TIER_ORDER[progress.length]) t.group.rotation.y = Math.max(0, Math.min(1.1, origin + turn)); },
+          end(s) { turn = s?.turn ?? turn; t.group.rotation.y = origin; if (origin + turn >= .9) onTier(iid); },
+          cancel() { t.group.rotation.y = origin; },
+        };
+      }
+      if (kind === 'pin' && phase === 'pin') {
+        const origin = pinGroup.position.clone(); let travel = 0;
+        return {
+          move(s) { travel = s.travel || 0; pinGroup.position.y = origin.y + Math.max(0, Math.min(.15, travel)); },
+          end(s) { travel = s?.travel ?? travel; pinGroup.position.copy(origin); if (travel >= .1) onPin(); },
+          cancel() { pinGroup.position.copy(origin); },
+        };
+      }
+      return null;
+    },
     handleInteract(kind, iid) {
       if (phase === 'finale') return;
-      if (kind === 'tier') onTier(iid);
-      else if (kind === 'pin') onPin();
+      if (kind === 'tier') api.toast('층문 손잡이를 잡고 경첩을 따라 여시오. 위에서 아래로…');
+      else if (kind === 'pin') api.toast('다리 속 핀을 위로 뽑으시오.');
       else if (kind === 'note') onNote();
     },
     revealHint() {
@@ -466,14 +498,15 @@ export function create(api) {
     },
     get mistook() { return softFailCount > 0; },
     getState() {
-      return { phase, hintLevel };
+      return { phase, hintLevel, progress: [...progress], pinVisible: pinGroup.visible,
+        tiers: Object.fromEntries(Object.entries(tiers).map(([key, t]) => [key, t.group.rotation.y])) };
     },
     solve() {
       TIER_ORDER.forEach((tid) => {
         if (!openSet.has(tid)) {
           progress.push(tid);
           openSet.add(tid);
-          tiers[tid].group.rotation.y = -1.1;
+          tiers[tid].group.rotation.y = 1.1;
           tiers[tid].open = true;
         }
       });
@@ -482,6 +515,6 @@ export function create(api) {
       phase = 'note';
       onNote();
     },
-    dispose(scene) { scene.remove(root); interactives.length = 0; },
+    dispose(scene) { scene.remove(root); disposeChapterResources(root, mats); interactives.length = 0; },
   };
 }

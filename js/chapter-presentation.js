@@ -30,7 +30,13 @@ const gestures = {
   pend:'추 · 축을 중심으로 흔들기', lantern:'등롱 · 테두리를 잡고 돌리기',
   slot:'방위 홈 · 선택한 부품의 문양과 견주기', pin:'핀 · 축을 따라 밀거나 당기기',
   latch:'빗장 · 홈을 따라 밀거나 당기기',
+  weight:'추 · 균형보를 따라 한 눈금씩 밀기', bottom:'이중바닥 · 드러난 들쇠를 들어 올리기',
+  bojagi:'보자기 · 가장자리를 잡고 접힘 축으로 들기', lock:'자물쇠 · 걸쇠를 잡고 돌리기',
+  secret:'비밀칸 · 손잡이를 바깥으로 당기기', peg:'장부못 · 닳은 눈금까지 돌리기',
+  tier:'층문 · 손잡이를 잡고 경첩을 따라 열기', tray:'문서 트레이 · 손잡이를 앞으로 당기기',
+  cord:'봉인 끈 · 매듭 끝을 잡고 앞으로 풀기', letter:'편지 · 펼쳐 읽기', note:'쪽지 · 펼쳐 읽기', slip:'기록 쪽지 · 펼쳐 읽기',
 };
 export function gestureDescription(chapterId, kind) {
+  if (chapterId === 11 && kind === 'latch') return '걸쇠 · 들쇠를 잡고 닳은 각까지 돌리기';
   return gestures[kind] || '흔적과 맞물림 살피기';
 }

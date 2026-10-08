@@ -9,8 +9,10 @@
  * Phases: bojagi → lock → secret → finale.
  * Visual: Joseon wedding chest — densified lacquer body, textile-like bojagi, crafted lock/secret.
  */
-import { boxMesh, invisibleHit } from '../materials.js';
+import { bevelBoxMesh as boxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
+import { disposeChapterResources } from '../chapter-resources.js';
+import { archivePalette, archiveLacquer, archiveCloth, mechanismFrame } from './archive-craft.js';
 
 export const id = 12;
 export const title = '혼수함';
@@ -61,12 +63,13 @@ export function create(api) {
   let hintLevel = 0;
   const interactives = [];
 
-  const woodMat = mats.woodRich || mats.wood;
-  const woodDark = mats.woodDark;
-  const woodAcc = mats.woodAccent || woodMat;
-  const lacquer = mats.lacquer || woodDark;
-  const brass = mats.brass;
-  const brassB = mats.brassBright || brass;
+  const palette = archivePalette(mats);
+  const woodMat = palette.wood;
+  const woodDark = palette.dark;
+  const woodAcc = palette.wood;
+  const lacquer = archiveLacquer(THREE, woodDark, 0x321e27);
+  const brass = palette.brass;
+  const brassB = palette.bright;
   const iron = mats.iron;
 
   // ---- Wedding chest carcass (혼수함) ----
@@ -194,9 +197,10 @@ export function create(api) {
     const g = new THREE.Group();
     g.position.set(f.x, 0.76, HINGE_Z);
     const clothW = f.i === TEACHING_FLAP ? 0.26 : CLOTH_W;
-    const mesh = boxMesh(THREE, clothW, 0.02, CLOTH_D, f.color, 0, 0, CLOTH_D / 2);
+    const fabric = archiveCloth(THREE, f.color);
+    const mesh = boxMesh(THREE, clothW, 0.02, CLOTH_D, fabric, 0, 0, CLOTH_D / 2);
     g.add(mesh);
-    g.add(boxMesh(THREE, clothW, 0.008, 0.024, f.color, 0, 0.012, 0.03));
+    g.add(boxMesh(THREE, clothW, 0.008, 0.024, fabric, 0, 0.012, 0.03));
     g.add(boxMesh(THREE, 0.036, 0.016, 0.036, brassB, 0, 0.018, 0.03));
     // Hem sits on the cloth top. Posts are separated so the bar count reads.
     motifPad(g, 0, 0.2, Math.min(0.15, clothW - 0.02));
@@ -245,6 +249,12 @@ export function create(api) {
   const lockHit = invisibleHit(THREE, 0.2, 0.2, 0.12, { id: 'LOCK', kind: 'lock' });
   lock.add(lockHit);
   interactives.push(lockBody, lockHit, keyhole, dropRing);
+  dropRing.userData = { id: 'LOCK', kind: 'lock' };
+  const lockPointer = boxMesh(THREE, .055, .012, .01, brassB, .027, 0, .066);
+  lock.add(lockPointer);
+  const lockTick = boxMesh(THREE, .028, .016, .01, brassB, .115 * Math.cos(1.2), .115 * Math.sin(1.2), .027);
+  lockTick.position.add(lock.position); lockTick.rotation.z = 1.2; root.add(lockTick);
+  markMeshes.push(lockPointer, lockTick);
 
   // ---- Secret compartment (side, densified) ----
   const secret = new THREE.Group();
@@ -258,12 +268,13 @@ export function create(api) {
   secretRing.rotation.y = Math.PI / 2;
   secretRing.position.set(0.11, 0, 0);
   secret.add(secretRing);
+  secretRing.userData = { id: 'SECRET', kind: 'secret' };
   secret.add(boxMesh(THREE, 0.01, 0.03, 0.025, brass, 0.1, 0, 0));
   // Side brackets
   [[-1], [1]].forEach(([sz]) => {
     secret.add(boxMesh(THREE, 0.03, 0.012, 0.04, brass, 0.08, 0.08, sz * 0.14));
   });
-  const slip = boxMesh(THREE, 0.12, 0.01, 0.1, mats.paper, 0, 0.08, 0);
+  const slip = boxMesh(THREE, 0.12, 0.01, 0.1, mats.slicePaper || mats.paper, 0, 0.08, 0);
   slip.visible = false;
   secret.add(slip);
   const sHit = invisibleHit(THREE, 0.24, 0.26, 0.4, { id: 'SECRET', kind: 'secret' });
@@ -393,7 +404,8 @@ export function create(api) {
 
   return {
     id, title, blurb, steps, hint, root,
-    getInteractives: () => interactives,
+    getInteractives: () => interactives.filter(m => phase === 'bojagi' ? m.userData.kind === 'bojagi' && !doneFlaps.has(m.userData.id) :
+      phase === 'lock' ? m.userData.kind === 'lock' : phase === 'secret' ? m.userData.kind === 'secret' : false),
     getMarkMeshes: () => markMeshes.slice(),
     build(scene) { scene.add(root); },
     start() { this.reset(); },
@@ -413,23 +425,48 @@ export function create(api) {
       if (api.setOrderHint) api.setOrderHint(hint);
       api.toast('혼수함 — 닫힌 겹의 가장자리를 살피시오.', true);
     },
+    getGestureFrame(kind, iid) {
+      if (kind === 'bojagi') {
+        const flap = flaps.find(f => f.i === iid);
+        if (flap) return mechanismFrame(THREE, flap.group, 'rotate', [1, 0, 0]);
+      }
+      if (kind === 'lock') return mechanismFrame(THREE, lock, 'rotate', [0, 0, 1]);
+      if (kind === 'secret') return mechanismFrame(THREE, secret, 'linear', [1, 0, 0]);
+    },
     getDragInteraction(kind, iid) {
+      if (kind === 'lock' && phase === 'lock') {
+        let origin;
+        return {
+          start() { origin = lock.rotation.z; },
+          move(s) { lock.rotation.z = Math.max(0, Math.min(1.2, origin + (s.turn || 0))); },
+          end(s) { if (origin + (s?.turn || 0) >= 1.05) onLock(); else animateTo(lock.rotation, 'z', 0, 180); },
+          cancel() { lock.rotation.z = origin; },
+        };
+      }
+      if (kind === 'secret' && phase === 'secret') {
+        const origin = secret.position.clone();
+        return {
+          move(s) { secret.position.x = origin.x + Math.max(0, Math.min(.27, s.travel || 0)); },
+          end(s) { secret.position.copy(origin); if ((s?.travel || 0) >= .16) onSecret(); else api.toast('비밀칸 손잡이를 바깥으로 당기시오.'); },
+          cancel() { secret.position.copy(origin); },
+        };
+      }
       if (phase !== 'bojagi' || kind !== 'bojagi') return null;
       const flap = flaps.find((f) => f.i === iid);
       if (!flap || doneFlaps.has(iid)) return null;
       let origin = 0;
       return {
         start() { origin = flap.group.rotation.x; },
-        move(s) { applyFold(flap, origin + (s.dy || 0) * FOLD_RAD_PER_PX); },
-        end(s) { finishFold(flap, origin + (s?.dy || 0) * FOLD_RAD_PER_PX); },
+        move(s) { applyFold(flap, origin + (s.turn ?? (s.dy || 0) * FOLD_RAD_PER_PX)); },
+        end(s) { finishFold(flap, origin + (s?.turn ?? (s?.dy || 0) * FOLD_RAD_PER_PX)); },
         cancel() { flap.group.rotation.x = origin; },
       };
     },
     handleInteract(kind) {
       if (phase === 'finale') return;
       if (kind === 'bojagi') onBojagi();
-      else if (kind === 'lock') onLock();
-      else if (kind === 'secret') onSecret();
+      else if (kind === 'lock') api.toast('자물쇠의 들쇠를 잡고 닳은 각까지 돌리시오.');
+      else if (kind === 'secret') api.toast('비밀칸 손잡이를 바깥으로 당기시오.');
     },
     revealHint() {
       hintLevel = bumpHintLevel(hintLevel);
@@ -457,6 +494,6 @@ export function create(api) {
       if (phase === 'lock') onLock();
       if (phase === 'secret') onSecret();
     },
-    dispose(scene) { scene.remove(root); interactives.length = 0; },
+    dispose(scene) { scene.remove(root); disposeChapterResources(root, mats); interactives.length = 0; },
   };
 }

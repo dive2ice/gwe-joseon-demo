@@ -8,19 +8,21 @@
  * Phases: tray → cord → slip → finale.
  * Visual: lacquer archive chest — densified brass case, crafted tray / cord knots / slip.
  */
-import { boxMesh, invisibleHit } from '../materials.js';
+import { bevelBoxMesh as boxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
+import { disposeChapterResources } from '../chapter-resources.js';
+import { archivePalette, archiveLacquer, archiveCloth, mechanismFrame } from './archive-craft.js';
 
 export const id = 15;
 export const title = '의궤함';
-export const blurb = '문서함 서랍을 밀고 봉인 끈 매듭을 풀어 기록 쪽지를 찾으시오.';
+export const blurb = '문서 트레이를 당기고 봉인 끈 매듭을 풀어 기록 쪽지를 찾으시오.';
 export const steps = [
   { id: 'A', label: 'A 서랍' },
   { id: 'B', label: 'B 봉인' },
   { id: 'C', label: '기록' },
 ];
 /** Non-spoiler footer; FULL only via explicit revealHint ×3 */
-export const hint = '문서함 트레이를 민 뒤, 봉인 매듭 패를 살피시오. · 청 끈은 이미 풀려 있소.';
+export const hint = '문서 트레이를 앞으로 당긴 뒤, 봉인 매듭 패를 살피시오. · 청 끈은 이미 풀려 있소.';
 export const HINT_PARTIAL = '봉인 끈은 인장 매듭 순서대로. 청 → 적 → 황…';
 export const HINT_RELATION = '청 끈을 본보기로 적·황 매듭을 이으시오. 인장 패의 순서가 끈의 순서다.';
 /** Spoiler: cord indices */
@@ -50,12 +52,13 @@ export function create(api) {
   let hintLevel = 0;
   const interactives = [];
 
-  const woodMat = mats.woodRich || mats.wood;
-  const woodDark = mats.woodDark;
-  const woodAcc = mats.woodAccent || woodMat;
-  const lacquer = mats.lacquer || woodDark;
-  const brass = mats.brass;
-  const brassB = mats.brassBright || brass;
+  const palette = archivePalette(mats);
+  const woodMat = palette.wood;
+  const woodDark = palette.dark;
+  const woodAcc = palette.wood;
+  const lacquer = archiveLacquer(THREE, woodDark, 0x19231e);
+  const brass = palette.brass;
+  const brassB = palette.bright;
   const iron = mats.iron;
 
   // ---- Lacquer archive chest carcass (의궤함) ----
@@ -154,7 +157,7 @@ export function create(api) {
 
   // ---- Crafted document tray (front slide) ----
   const tray = new THREE.Group();
-  tray.position.set(0, 0.32, 0.15);
+  tray.position.set(0, 0.32, 0.16);
   root.add(tray);
   // Tray body / face
   const trayFace = boxMesh(THREE, 0.88, 0.14, 0.42, woodAcc, 0, 0, 0);
@@ -227,7 +230,7 @@ export function create(api) {
 
   // ---- Crafted seal / cord knots (three segments on lid) ----
   const cords = [];
-  const cordMats = [mats.bangRed, mats.bangYellow, mats.bangBlue];
+  const cordMats = [mats.bangRed, mats.bangYellow, mats.bangBlue].map(m => archiveCloth(THREE, m || woodMat));
   const cordLabels = ['적', '황', '청'];
   for (let i = 0; i < 3; i++) {
     const g = new THREE.Group();
@@ -305,12 +308,13 @@ export function create(api) {
 
   // ---- Crafted archive slip ----
   const slip = new THREE.Group();
-  slip.position.set(0, 0.38, 0.35);
+  slip.position.set(0, .45, .57);
+  slip.rotation.x = .6;
   slip.visible = false;
   root.add(slip);
-  slip.add(boxMesh(THREE, 0.24, 0.01, 0.17, mats.paper, 0, 0, 0));
+  slip.add(boxMesh(THREE, 0.24, 0.01, 0.17, mats.slicePaper || mats.paper, 0, 0, 0));
   // Folded edge
-  slip.add(boxMesh(THREE, 0.06, 0.008, 0.05, mats.paper, 0.08, 0.008, 0.05));
+  slip.add(boxMesh(THREE, 0.06, 0.008, 0.05, mats.slicePaper || mats.paper, 0.08, 0.008, 0.05));
   // Archive seal blot (red)
   slip.add(boxMesh(THREE, 0.045, 0.008, 0.04, mats.bangRed, -0.07, 0.01, -0.04));
   // Brass corner clip
@@ -347,6 +351,7 @@ export function create(api) {
         c.group.scale.set(1, 1, 1);
         c.group.visible = true;
       }
+      c.group.position.z = .05;
     });
   }
 
@@ -387,7 +392,7 @@ export function create(api) {
         api.playWrong();
         api.vibrate(18);
         softFailShake();
-        api.toast('먼저 문서함 서랍을 미시오.');
+        api.toast('먼저 문서 트레이를 앞으로 당기시오.');
       } else if (phase === 'slip') {
         api.toast('봉인은 이미 풀렸소. 기록 쪽지를 살피시오.');
       }
@@ -466,7 +471,7 @@ export function create(api) {
     getInteractives: () => {
       // QA Critical: huge trayHit must not steal slip clicks after tray opens
       if (phase === 'tray') return interactives.filter((m) => m.userData && m.userData.kind === 'tray');
-      if (phase === 'cord') return interactives.filter((m) => m.userData && m.userData.kind === 'cord');
+      if (phase === 'cord') return interactives.filter((m) => m.userData && m.userData.kind === 'cord' && !cordDone.has(m.userData.id));
       if (phase === 'slip') return interactives.filter((m) => m.userData && m.userData.kind === 'slip');
       return [];
     },
@@ -481,10 +486,11 @@ export function create(api) {
       bodyGroup.position.x = 0;
       cordProgress = [];
       cordDone.clear();
-      tray.position.set(0, 0.32, 0.15);
+      tray.position.set(0, 0.32, 0.16);
       cords.forEach((c) => {
         c.group.scale.set(1, 1, 1);
         c.group.visible = true;
+        c.group.position.z = .05;
       });
       slip.visible = false;
       interactives.forEach((m) => {
@@ -497,15 +503,42 @@ export function create(api) {
           if (!interactives.includes(o)) interactives.push(o);
         }
       });
-      api.setObjective('의궤함 전면 문서 트레이를 앞으로 미시오. 그 뒤 봉인 매듭 패를…');
+      api.setObjective('의궤함 전면 문서 트레이를 앞으로 당기시오. 그 뒤 봉인 매듭 패를…');
       api.setSteps('A', []);
       if (api.setOrderHint) api.setOrderHint(hint);
       api.toast('의궤함 — 문서함과 봉인 매듭을 살피시오.', true);
     },
+    getGestureFrame(kind, iid) {
+      if (kind === 'tray') return mechanismFrame(THREE, tray, 'linear', [0, 0, 1]);
+      if (kind === 'cord') {
+        const cord = cords.find(c => c.i === iid);
+        if (cord) return mechanismFrame(THREE, cord.group, 'linear', [0, 0, 1]);
+      }
+    },
+    getDragInteraction(kind, iid) {
+      if (kind === 'tray' && phase === 'tray') {
+        const origin = tray.position.clone(); let travel = 0;
+        return {
+          move(s) { travel = s.travel || 0; tray.position.z = origin.z + Math.max(0, Math.min(.27, travel)); },
+          end(s) { travel = s?.travel ?? travel; tray.position.copy(origin); if (travel >= .18) onTray(); },
+          cancel() { tray.position.copy(origin); },
+        };
+      }
+      if (kind === 'cord' && phase === 'cord' && !cordDone.has(iid)) {
+        const cord = cords.find(c => c.i === iid); if (!cord) return null;
+        const origin = cord.group.position.z; let travel = 0;
+        return {
+          move(s) { travel = s.travel || 0; cord.group.position.z = origin + Math.max(0, Math.min(.18, travel)); },
+          end(s) { travel = s?.travel ?? travel; cord.group.position.z = origin; if (travel >= .12) onCord(iid); },
+          cancel() { cord.group.position.z = origin; },
+        };
+      }
+      return null;
+    },
     handleInteract(kind, iid) {
       if (phase === 'finale') return;
-      if (kind === 'tray') onTray();
-      else if (kind === 'cord') onCord(iid);
+      if (kind === 'tray') api.toast('문서 트레이의 손잡이를 앞으로 당기시오.');
+      else if (kind === 'cord') api.toast('매듭 끝을 잡고 앞으로 풀어 내시오.');
       else if (kind === 'slip') onSlip();
     },
     revealHint() {
@@ -514,7 +547,7 @@ export function create(api) {
     },
     get mistook() { return softFailCount > 0; },
     getState() {
-      return { phase, hintLevel };
+      return { phase, hintLevel, trayOpen, trayZ: tray.position.z, cordProgress: [...cordProgress], slipVisible: slip.visible };
     },
     solve() {
       trayOpen = true;
@@ -526,6 +559,6 @@ export function create(api) {
       });
       if (phase === 'slip') onSlip();
     },
-    dispose(scene) { scene.remove(root); interactives.length = 0; },
+    dispose(scene) { scene.remove(root); disposeChapterResources(root, mats); interactives.length = 0; },
   };
 }
