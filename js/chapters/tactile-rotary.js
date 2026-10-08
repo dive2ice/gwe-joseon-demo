@@ -65,9 +65,19 @@ export function motifPlaque(THREE, text, fallback, width = 0.028, height = 0.028
     const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 64;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#261e15'; ctx.fillRect(0, 0, 128, 64);
-    ctx.fillStyle = '#ceb586'; ctx.font = '44px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 64, 34);
+    ctx.fillStyle = '#ceb586'; ctx.font = '44px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 64, 34, 112);
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
-    material = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.68, metalness: 0.2, side: THREE.DoubleSide });
+    material = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.68, metalness: 0.2 });
   } catch (_) { /* The engraved tick remains usable without canvas. */ }
-  return new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+  // A double-sided textured plane mirrors its writing when viewed from behind.
+  // Give each side its own outward-facing plane so both read left to right.
+  const plaque = new THREE.Group();
+  const geometry = new THREE.PlaneGeometry(width, height);
+  const front = new THREE.Mesh(geometry, material);
+  const back = new THREE.Mesh(geometry, material);
+  front.position.z = 0.00001;
+  back.position.z = -0.00001;
+  back.rotation.y = Math.PI;
+  plaque.add(front, back);
+  return plaque;
 }

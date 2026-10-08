@@ -1,8 +1,15 @@
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {ClampToEdgeWrapping} from 'three';
 import {geometryKey} from './blender-geometry-key.js';
 
 const cache=new Map(),loader=new GLTFLoader();
-const eligible=mesh=>mesh.isMesh&&mesh.geometry?.attributes.position&&!Array.isArray(mesh.material)&&mesh.material?.visible!==false&&mesh.material?.opacity>0;
+// The authored GLB can remap UVs. Canvas labels and paintings need their
+// original UVs or their writing may appear mirrored on the furniture.
+const canvasArtwork=mesh=>{
+ const map=mesh.material?.map;
+ return map?.isCanvasTexture&&map.wrapS===ClampToEdgeWrapping&&map.wrapT===ClampToEdgeWrapping;
+};
+const eligible=mesh=>mesh.isMesh&&mesh.geometry?.attributes.position&&!Array.isArray(mesh.material)&&mesh.material?.visible!==false&&mesh.material?.opacity>0&&!canvasArtwork(mesh);
 function library(id){
  if(!cache.has(id)){
   const promise=loader.loadAsync('./assets/crafted/ch'+String(id).padStart(2,'0')+'.glb').then(gltf=>{

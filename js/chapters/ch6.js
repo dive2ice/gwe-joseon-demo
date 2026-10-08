@@ -19,7 +19,7 @@
 import { boxMesh, bevelBoxMesh, invisibleHit } from '../materials.js';
 import { craftPalette, addRaisedPanel, disposeCraftRoot } from '../campaign-craft-art.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
-import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=ko-20261008';
+import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=text-20261008';
 
 export const id = 6;
 export const title = '혼천의 궤';

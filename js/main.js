@@ -1,4 +1,4 @@
-import { attachBlenderFinish } from './blender-finish.js';
+import { attachBlenderFinish } from './blender-finish.js?v=text-20261008';
 import { PART_MARKS } from './inventory.js';
 /**
  * 궤 : 조선의 비밀 — multi-chapter greybox prototype
@@ -19,7 +19,7 @@ import { createSliceExperience } from './slice-experience.js';
 import { createCampaignCinematics } from './campaign-cinematics.js';
 import { playStoryCue } from './audio.js';
 import { createAnimSystem, prefersReducedMotion } from './anim.js';
-import { CHAPTER_META, createChapter, MAIN_CHAPTER_IDS, DLC_CHAPTER_IDS } from './chapters/index.js?v=ko-20261008';
+import { CHAPTER_META, createChapter, MAIN_CHAPTER_IDS, DLC_CHAPTER_IDS } from './chapters/index.js?v=text-20261008';
 import {
   PARTS, grantAllParts, getOwnedParts,
 } from './inventory.js';

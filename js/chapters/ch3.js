@@ -15,7 +15,7 @@ import { boxMesh, bevelBoxMesh, invisibleHit } from '../materials.js';
 import { bumpHintLevel, requestHint, softFailNoHint } from '../hint-policy.js';
 
 import { createOpeningArt } from './opening-art.js';
-import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=ko-20261008';
+import { atStop, gestureFrame, rotaryDrag, pullDrag, MOTIFS, stopMotif, motifPlaque } from './tactile-rotary.js?v=text-20261008';
 
 export const id = 3;
 export const title = '어보 궤';
@@ -332,7 +332,7 @@ export function create(api) {
     interactives.push(hit, disc, rim, plaque, notch);
     const axle=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.046,16),iron);axle.rotation.x=Math.PI/2;
     axle.position.set(dialXs[i],dialY+.02,frontZ+.02);axle.name='DialFixedAxle_'+c.key;bodyGroup.add(axle);
-    dialMeshes.push({ group: g, disc, notch, rim });
+    dialMeshes.push({ group: g, disc, notch, rim, plaque });
   });
 
   // rotation.z sends local +Y (0, r, 0) to (−sin θ, cos θ). Ticks use that offset
@@ -460,6 +460,8 @@ export function create(api) {
   function applyDials() {
     dialMeshes.forEach((d, i) => {
       d.group.rotation.z = dialPos[i] * (Math.PI / 2);
+      // The color name is a fixed hub marker; the pointer alone carries the turn.
+      d.plaque.rotation.z = -d.group.rotation.z;
       d.disc.material.emissiveIntensity = 0.12;
     });
   }

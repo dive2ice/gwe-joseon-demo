@@ -229,10 +229,10 @@ export function create(api) {
       ctx.lineWidth = 2;
       ctx.strokeRect(2, 2, 124, 32);
       ctx.fillStyle = '#e8d9b0';
-      ctx.font = 'bold 12px serif';
+      ctx.font = 'bold 18px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(label, 64, 18);
+      ctx.fillText(label, 64, 18, 112);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       return new THREE.MeshStandardMaterial({

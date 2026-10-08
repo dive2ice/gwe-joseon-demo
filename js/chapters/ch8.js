@@ -186,13 +186,13 @@ export function create(api) {
       ctx.strokeStyle = '#e8d9b0';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(16, 48);
-      ctx.quadraticCurveTo(32, 8, 48, 40);
+      ctx.moveTo(16, 36);
+      ctx.quadraticCurveTo(32, 5, 48, 34);
       ctx.stroke();
       ctx.fillStyle = '#c9a84a';
-      ctx.font = 'bold 14px serif';
+      ctx.font = 'bold 18px serif';
       ctx.textAlign = 'center';
-      ctx.fillText(label, 32, 58);
+      ctx.fillText(label, 32, 56, 54);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       return new THREE.MeshStandardMaterial({
@@ -218,10 +218,10 @@ export function create(api) {
       ctx.lineWidth = 2;
       ctx.strokeRect(2, 2, 124, 32);
       ctx.fillStyle = '#e8d9b0';
-      ctx.font = 'bold 13px serif';
+      ctx.font = label.length <= 3 ? 'bold 20px serif' : 'bold 16px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(label, 64, 18);
+      ctx.fillText(label, 64, 18, 116);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       return new THREE.MeshStandardMaterial({
@@ -257,7 +257,8 @@ export function create(api) {
     new THREE.PlaneGeometry(0.28, 0.08),
     makeCrestPlaque('수문장 · 먹선'),
   );
-  crestPlaque.position.set(0, bodyY0 + BODY_H * 0.55, frontZ + 0.025);
+  // Leave a clear gap below the three ink fragments so the caption stays legible.
+  crestPlaque.position.set(0, bodyY0 + BODY_H * 0.35, frontZ + 0.025);
   bodyGroup.add(crestPlaque);
 
   // Unfolded fragments sit at their physical panel positions; reconstruct the chain from their ink joints.
